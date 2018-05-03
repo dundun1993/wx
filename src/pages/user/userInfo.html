@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>共享摄影灯</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="stylesheet" href="../../css/weui.min.css">
+    <link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../../css/less.css">
+</head>
+
+<body>
+    <div class="userinfo">
+        <script id="userTemp" type="text/html">
+            <a class="weui-cell weui-cell_access" id="getImg" style="border-bottom: 0;">
+                <div class="weui-cell__hd">
+                    <img src="{{data.head}}" id="iconHead" />
+                </div>
+                <div class="weui-cell__bd">
+                    <div class="weui-cell__ft">更换头像</div>
+                </div>
+            </a>
+            <input type="file" id="pst" name="file" accept="image/*" style="height: 0;">
+            <a class="weui-cell weui-cell_access" id="nameC">
+                <div class="weui-cell__bd">昵称</div>
+                <div class="weui-cell__bd">
+                    <div class="weui-cell__ft modyClick">{{data.name}}</div>
+                    <input class="weui-input modyName" type="text" placeholder="请修改昵称" style="border-bottom: 1px solid #d2d2d2; display:none">
+                </div>
+            </a>
+            <div class="weui-cells cardstyle">
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <p>身份证信息</p>
+                    </div>
+                    {{if data.auth == 0}}
+                    <div class="weui-cell_access"><a href="./binding.html" class="weui-cell__ft">（未绑定）</a></div>
+                    {{else if data.auth == 1}}
+                    <div class="weui-cell__ft">（未通过）</div>
+                    {{else if data.auth == 2}}
+                    <div class="weui-cell__ft">（已通过）</div>
+                    {{/if}}
+                </div>
+            </div>
+            {{if data.auth != 0}}
+            <div class="idArea">
+                <div class="id-show">
+                    <p class="id-show-word">正面</p>
+                    <div class="id-show-box">
+                        <img src="{{data.positive}}" alt="加载失败">
+                    </div>
+                </div>
+                <div class="id-show">
+                    <p class="id-show-word">反面</p>
+                    <div class="id-show-box">
+                        <img src="{{data.opposite}}" alt="加载失败">
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+        </script>
+    </div>
+
+    <script src="../../js/jquery1.11.3.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+    <script src="../../js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../js/mcfish.js?v=12"></script>
+    <script>
+        $(function () {
+            var $http = mcfish.API;
+            var $handle = mcfish.Handle;
+            var $tools = mcfish.Tools;
+            var myurl = $tools.parseURL(location.href);
+            var auth = myurl.params['auth'];
+
+            $http.getProfile(function (res) {
+                if (res.status === 0) {
+                    res.data.auth = auth
+                    var html = template('userTemp', res);
+                    $('.userinfo')[0].innerHTML += html;
+                } else {
+                    alert(res.resmsg)
+                }
+            })
+
+            $('#nameC').on('touchend', function () {
+                $('.modyClick').hide();
+                $('.modyName').show();
+            })
+            
+            $('.modyName').blur(function () {  // 修改名字 
+                $(this).hide();
+                $('.modyClick').show();
+                var nName = $(this).val();
+                if (nName == '') {
+                    alert('请输入修改昵称');
+                    return;
+                }
+                $http.uptProfile({
+                    name: nName
+                }, function (res) {
+                    if (res.status === 0) {
+                        $('.modyClick').text(nName)
+                        $.toast('修改成功')
+                    } else {
+                        alert(res.resmsg)
+                    }
+                })
+            })
+
+            $('#getImg').click(function () {
+                $('#pst').trigger('click')
+            })
+
+            $('#pst').change(function () {  // 上传头像
+                var files = $(this)[0].files[0];
+                $handle.postImgURL(files).then(function (result) {
+                    $http.uploadImage(result, function (res) {
+                        if (res.status == 0) {
+                            $('#iconHead').attr('src', res.data.img)
+                        } else {
+                            alert(res.resmsg)
+                        }
+                    })
+                })
+            })
+
+        })
+    </script>
+</body>
+
+</html>

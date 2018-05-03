@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="../../css/weui.min.css">
+    <link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/less.css">
+    <title>共享摄影灯</title>
+</head>
+
+<body>
+    <div class="tp1_admin">
+        <div class="section_word">
+            <img src="../../images/administrator.png" alt="admin_head">
+            <p>欢迎管理员</p>
+            <p class="adminName"></p>
+        </div>
+        <a class="we-btn weui-btn weui-btn_primary" id="close">关闭设备</a>
+    </div>
+<script src="../../js/jquery1.11.3.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script src="../../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../js/mcfish.js"></script>
+<script>
+    var $http = mcfish.API;
+    var $tools = mcfish.Tools;
+    var url = window.location.href;
+    var obj = JSON.parse(window.sessionStorage.userinfo) ;
+    var destHost = "http://www.mopai99.com/";
+    $(function(){
+        $('.adminName').text(obj.name);
+        $('#close').on('touchend', function () {
+            $http.wakeup_scan_weixin(url, function(res){
+                var request = $tools.parseURL(res);
+                if (request.params['sno'] == undefined) {
+                    alert('不能识别的二维码');
+                    return;
+                }
+                var sno = request.params['sno'];
+                window.location.href = './admin_uselog.html?sno='+sno 
+            });
+        })
+    })
+</script>
+</body>
+</html>

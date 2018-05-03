@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>历史工单</title>
+		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<link rel="stylesheet" type="text/css" href="css/list.css" />
+		<link rel="stylesheet" type="text/css" href="css/weui.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/jquery-weui.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/LCalendar.css" />
+		<style type="text/css">
+			.container {
+				padding: 3%;
+			}
+			
+			.dateChoice{
+				padding: 10px;
+				border-radius: 5px;
+				background: #fff;
+				margin-bottom: 10px;
+				line-height: 30px;
+			}
+			.dateChoice img{
+				width: 8px;
+				float: right;
+				margin-top: 8px;
+			}
+			table {
+				font-size: 14px;
+				width: 100%;
+				text-align: center;
+				line-height: 40px;
+			}
+			
+			table tr {
+				border-bottom: 1px solid #e9eaec;
+			}
+			
+			table th {
+				width: 25%;
+				color: #00BBD7;
+			}
+			
+			table td {
+				width: 30%;
+			}
+			
+			table img {
+				width: 22px;
+				height: auto;
+				vertical-align: middle;
+			}
+			
+			button {
+				margin-top: 20px;
+				height: 45px;
+			}
+			
+			.praise_choiceCon {
+				width: 94%;
+				padding: 0 3%;
+				text-align: left;
+				height: 260px;
+				background: #fff;
+				font-size: 16px;
+				line-height: 40px;
+			}
+			
+			.weui-picker-modal .picker-item {
+				font-size: 16px;
+				font-family: "微软雅黑";
+			}
+			
+			.weui-picker-modal .picker-items-col {
+				width: 50%;
+			}
+			.paging-box {
+				text-align: center;
+			}
+			.paging-box span {
+				display: inline-block;
+				width: 15%;
+				font-weight: bold;
+				color: #000000;
+				text-align: center;
+			}
+			.paging-box span:nth-child(1) {
+				margin-right: 10px;
+			}
+			.paging-box .disabledStyle {
+				color: #CCCCCC;
+			}
+		</style>
+	</head>
+
+	<body ontouchstart="" style="background: #f2f2f2;">
+		<div id="orderDetail">
+			<div class="headerCon" style="text-align: right;">
+				<!--<i class="goBack">返回</i>-->
+				<!--<span>历史</span>-->
+				<span class="querybtn" style="color: #00BBD7;margin-right: 15px;">查询</span>
+			</div>
+			<div class="container clearfix">
+				<div class="dateChoice clearfix">
+					<span style="float: left;display: inline-block;line-height: 45px;">选择查询时间： </span><!--<img src="img/right_icon2x.png" /><i class="lr" style="margin-right: 6px;font-size: 14px;">7月1日-7月15日</i>-->
+				
+					<!--start-->
+					<div class="main_page" style="float: left;margin-left: 10px;width: 30%;">
+							<div class="select_start_date" style="height: 45px;line-height: 45px;">
+								<div class="start_date_right">
+									<input type="text" class="starttime" name="start_date" id="start_date" placeholder="开始日期 >>" readonly="readonly" style="color: #000000;width: 72%;"/>
+								</div>
+							</div>
+					</div>
+					<!--end-->
+					<div class="main_page" style="float: left;width: 30%;">
+							<div class="select_start_date" style="height: 45px;line-height: 45px;">
+								<div class="start_date_right">
+									<input type="text" class="endtime" name="start_date" id="start_date" placeholder="结束日期 >>" readonly="readonly" style="color: #000000;width: 72%;"/>
+								</div>
+							</div>
+					</div>
+				<!--end-->
+				</div>
+				<div class="list_info" style="margin-bottom: 20px;">
+					<div class="middle  clearfix">
+						<table border="" cellspacing="0" cellpadding="0">
+							<thead>
+								<tr>
+									<th>时间</th>
+									<th>工单号</th>
+									<th>金额</th>
+									<th></th>
+							    </tr>
+							</thead>
+							
+							<tbody class="box"></tbody>
+							<!--<tr class="materials_info">
+								<td>7-15</td>
+								<td>空调</td>
+								<td>￥28.00</td>
+								<td><img style="width: 8px;" src="img/right_icon2x.png"/></td>
+							</tr>-->
+						</table>
+					</div>
+					<p style="line-height: 36px;text-align: right;font-size: 14px;">总金额： <i class="totleNum" style="color: #ffba00;">￥00.00</i></p>
+					<div class="paging-box">
+						<span class="upPage disabledStyle">上一页</span>
+						<span class="downPage">下一页</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>
+<script src="js/fastclick.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.1.4.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/mcfish.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/LCalendar.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	//var workerno  = "208323";
+	$(function() {
+		FastClick.attach(document.body);
+		var startNum = 1;
+		var queryNum = 1;
+		var ssize1 = 0;
+		var ssize2 = 0;
+		//先判断是否存在uid
+		var myUrl	= parseURL(location.href);
+		var code	= myUrl.params['code'];
+		if ($.cookie("uid")){
+			console.log(1);
+		} else if (code != null){
+			query_userinfo_weixin(code);
+		}else{
+			var auth = get_auth_url_weixin(window.location, 'snsapi_privateinfo');
+			window.location = auth;
+		}
+//		// userid
+		var workerno  = $.cookie("uid");
+            //历史工单
+            getWorksheet(startNum);
+            function getWorksheet(startNum) {
+            	$(".box").empty()
+            	get_history_worksheet(workerno,startNum,function(data){
+	            	var data = JSON.parse(data);
+	            	console.log(data)
+	            	if(data.status==0){
+	            		ssize1 = data.data.ssize;
+	            		var worksheet = data.data;
+						var datas = worksheet.workSheetList;
+						console.log(datas);
+						for(var i in datas){
+							$str="";
+							$str+="<tr class='materials_info'>";
+							$str+="<td class='text-time'></td>";
+							$str+="<td>"+datas[i].workNo+"</td>";
+							$str+="<td>￥"+datas[i].money+"</td>";
+							$str+="<td><img data-id='"+datas[i].workNo+"' onclick='historyworksheet(this)' style='width: 8px;' src='img/right_icon2x.png'/></td></tr>";
+							$(".box").append($str);
+						}
+	
+						//时间戳
+			           for(var i in datas){
+				          	var creattime = datas[i].createTime;
+				         	 var d = getDate(creattime);
+				          	$(".text-time").each(function(index,element){
+				          	  	if(index==i){
+				          	  		var _type= "<span>"+d+"</span>";
+				                	$(_type).appendTo($(this));
+				          		}
+				          	})
+				        }
+	        			//时间戳方法
+		            	function add0(m){return m<10?'0'+m:m };
+		            	function getDate(shijianchuo) {
+						  //shijianchuo是整数，否则要parseInt转换
+						  var time = new Date(shijianchuo);
+						  var y = time.getFullYear();
+						  var m = time.getMonth()+1;
+						  var d = time.getDate();
+						  var h = time.getHours();
+						  var mm = time.getMinutes();
+						  var s = time.getSeconds();
+						  return y+'-'+add0(m)+'-'+add0(d);
+						}
+						$(".totleNum").text(Math.round(worksheet.count*100)/100)
+	            	}
+	            })
+            }
+			//分页
+           	$(".upPage").click(function() {
+           		if(startNum > 1) {
+           			$(this).removeClass('disabledStyle')
+           			$(".downPage").removeClass('disabledStyle')
+           			startNum--;
+           			getWorksheet(startNum);
+           			if(startNum == 1) {
+           				$(this).addClass('disabledStyle')
+           			}
+           		} else if(startNum == 1) {
+           			$(this).addClass('disabledStyle')
+           		}
+           	})
+           	$(".downPage").click(function() {
+           		console.log(ssize1)
+           		if(ssize1 <= 10) {
+           			$(this).addClass('disabledStyle')
+           		} else if(ssize1 > 10) {
+           			ssize1=Math.ceil(ssize1/10);
+           			console.log(ssize1)
+           			if(startNum < ssize1) {
+	           			$(this).removeClass('disabledStyle')
+	           			startNum++;
+	           			if(startNum==ssize1) {
+	           				$(this).addClass('disabledStyle')
+	           			}
+	           			getWorksheet(startNum);
+	           			$(".upPage").removeClass('disabledStyle')
+	           		} else if(startNum >= ssize1) {
+	           			$(this).addClass('disabledStyle')
+	           		}
+           		}
+           	})
+        //查询历史工单
+        $(".querybtn").on("click",function(){
+			$(".box").text('');//每次查询之前先清空，再添加；
+        	 var date1 = $(".starttime").val();
+            var date2 = $(".endtime").val();
+            console.log("date1="+date1+"date2"+date2);
+            function queryWorksheet(queryNum) {
+            	get_query_history_worksheet(workerno,queryNum,date1,date2,function(data){
+		          	var data = JSON.parse(data);
+	            	console.log(data)
+	            	if(data.status==0){
+	            		//ssize2 = data.data.ssize;
+	            		var worksheet = data.data;
+						var datas = worksheet.workSheetList;
+						console.log(datas);
+						for(var i in datas){
+							$str="";
+							$str+="<tr class='materials_info'>";
+							$str+="<td class='text-time'></td>";
+							$str+="<td>"+datas[i].workNo+"</td>";
+							$str+="<td>￥"+datas[i].money+"</td>";
+							$str+="<td><img data-id='"+datas[i].workNo+"' onclick='historyworksheet(this)' style='width: 8px;' src='img/right_icon2x.png'/></td></tr>";
+							$(".box").append($str);
+						}
+						
+						//时间戳
+			           for(var i in datas){
+					        var creattime = datas[i].createTime;
+					        var d = getDate(creattime);
+					        $(".text-time").each(function(index,element){
+					          	if(index==i){
+					          	  	var _type= "<span>"+d+"</span>";
+					                $(_type).appendTo($(this));
+					          	}
+					        })
+				        }
+	        			//时间戳方法
+	            		function add0(m){return m<10?'0'+m:m };
+	            		function getDate(shijianchuo) {
+					  		//shijianchuo是整数，否则要parseInt转换
+						  	var time = new Date(shijianchuo);
+						  	var y = time.getFullYear();
+						  	var m = time.getMonth()+1;
+						  	var d = time.getDate();
+						  	var h = time.getHours();
+						  	var mm = time.getMinutes();
+						  	var s = time.getSeconds();
+						  	return y+'-'+add0(m)+'-'+add0(d);
+						};
+						$(".totleNum").text(Math.round(worksheet.count*100)/100)
+	            	}
+	            })
+            }
+            queryWorksheet(queryNum);
+            //分页
+           	$(".upPage").click(function() {
+           		if(queryNum > 1) {
+           			$(this).removeClass('disabledStyle')
+           			$(".downPage").removeClass('disabledStyle')
+           			queryNum--;
+           			getWorksheet(queryNum);
+           			if(queryNum == 1) {
+           				$(this).addClass('disabledStyle')
+           			}
+           		} else if(queryNum == 1) {
+           			$(this).addClass('disabledStyle')
+           		}
+           	})
+           	$(".downPage").click(function() {
+           		if(ssize2 <= 10) {
+           			$(this).addClass('disabledStyle')
+           		} else if(ssize2 > 10) {
+           			ssize=Math.ceil(ssize2/10);
+           			if(queryNum < ssize2) {
+	           			$(this).removeClass('disabledStyle')
+	           			queryNum++;
+	           			if(queryNum==ssize1) {
+	           				$(this).addClass('disabledStyle')
+	           			}
+	           			getWorksheet(queryNum);
+	           			$(".upPage").removeClass('disabledStyle')
+	           		} else if(queryNum == ssize2) {
+	           			$(this).addClass('disabledStyle')
+	           		}
+           		}
+           	})
+        })
+	});
+	 //点击进入详情
+    function historyworksheet(e){
+    	var workNo = $(e).data("id");
+		console.log(workNo);
+		window.location.href = 'historyOrder_detail.html?workNo='+workNo;
+    }
+</script>
+<!--开始日期-->
+<script type="text/javascript">
+		var calendar = new LCalendar();
+		calendar.init({
+			'trigger': '#start_date', //标签id
+			'type': 'date', //date 调出日期选择 datetime 调出日期时间选择 time 调出时间选择 ym 调出年月选择,
+			'minDate': (new Date().getFullYear()-3) + '-' + 1 + '-' + 1, //最小日期
+			'maxDate': (new Date().getFullYear()+3) + '-' + 12 + '-' + 31 //最大日期
+		});
+		var calendar = new LCalendar();
+		calendar.init({
+			'trigger': '#end_date', //标签id
+			'type': 'date', //date 调出日期选择 datetime 调出日期时间选择 time 调出时间选择 ym 调出年月选择,
+			'minDate': (new Date().getFullYear()-3) + '-' + 1 + '-' + 1, //最小日期
+			'maxDate': (new Date().getFullYear()+3) + '-' + 12 + '-' + 31 //最大日期
+		});
+		//		$(function() {
+		//			$('#start_date').date();
+		//			$('#end_date').date();
+		//		});
+</script>
+<!--结束日期-->
+<script type="text/javascript">
+		var calendar = new LCalendar();
+		calendar.init({
+			'trigger': '.endtime', //标签id
+			'type': 'date', //date 调出日期选择 datetime 调出日期时间选择 time 调出时间选择 ym 调出年月选择,
+			'minDate': (new Date().getFullYear()-3) + '-' + 1 + '-' + 1, //最小日期
+			'maxDate': (new Date().getFullYear()+3) + '-' + 12 + '-' + 31 //最大日期
+		});
+		var calendar = new LCalendar();
+		calendar.init({
+			'trigger': '#end_date', //标签id
+			'type': 'date', //date 调出日期选择 datetime 调出日期时间选择 time 调出时间选择 ym 调出年月选择,
+			'minDate': (new Date().getFullYear()-3) + '-' + 1 + '-' + 1, //最小日期
+			'maxDate': (new Date().getFullYear()+3) + '-' + 12 + '-' + 31 //最大日期
+		});
+		//		$(function() {
+		//			$('#start_date').date();
+		//			$('#end_date').date();
+		//		});
+</script>

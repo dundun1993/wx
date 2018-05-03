@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>共享摄影灯</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="stylesheet" href="../../css/weui.min.css">
+    <link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../css/less.css?v=111">
+</head>
+
+<body>
+    <div class="container-fluid charge">
+        <div class="row">
+            <div class="col-xs-12 bg">
+                <p class="value"></p>
+                <p class="remain">
+                    可用余额(元)
+                </p>
+            </div>
+        </div>
+        <div class="row title">
+            <p>充值金额</p>
+        </div>
+        <div class="row chargeArea" id="xxx">
+            <script id='moneyList' type="text/html">
+                <div class="cpanel">
+                    {{each data key}}
+                    <div data-amount="{{key.amount}}" onclick="setAmount(this)">￥ {{key.comment}}</div>
+                    {{/each}}
+                </div>
+            </script>
+        </div>
+        <div class="row title">
+            <p>支付方式</p>
+        </div>
+        <div class="row title imgWord">
+            <div class="group">
+                <img src="../../images/wechat1.png" alt="">
+                <p>微信方式</p>
+            </div>
+        </div>
+        <button class="weui-btn weui-btn_primary" id="checkBtn">立即支付</button>
+        <p class="xieyi">
+            <a href="../dev/agreement.html?v=2">共享摄影灯服务协议</a>
+        </p>
+    </div>
+    <script src="../../js/jquery1.11.3.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+    <script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script src="../../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../js/mcfish.js"></script>
+    <script>
+        $(function () {
+            var $http = mcfish.API;
+            var $tools = mcfish.Tools;
+            var myurl = $tools.parseURL(location.href);
+
+            $http.queryWallet(function (res) {
+				if (res.status === 0) {
+					$('.value').text(res.data.money / 100)
+				}
+				else {
+					alert(res.resmsg);
+				}
+			})
+            $http.getCharge(function (res) {
+                if (res.status == 0) {
+                    var moneyHtml = template('moneyList', res)
+                    $('#xxx').html(moneyHtml)
+                } else {
+                    alert(res.resmsg)
+                }
+            })
+
+            $('#checkBtn').on('click', function () {
+                var money = $('.clickbg').attr('data-amount');
+                if (money === undefined) {
+                    alert('请选择充值金额');
+                    return;
+                }
+                $http.chargeMoney(money, '2', function (res) {
+                    if (res.status === 0) {
+                        $http.wakeup_pay_weixin(res.data)
+                    }
+                    else {
+                        alert(res.msg)
+                    }
+                })
+            })
+        })
+
+        function setAmount(obj) {
+            $(obj).addClass('clickbg').siblings().removeClass();
+        }
+
+    </script>
+</body>
+
+</html>

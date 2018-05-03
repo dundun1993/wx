@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>预约时间</title>
+		<link rel="stylesheet" type="text/css" href="css/index.css" />
+		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<link rel="stylesheet" type="text/css" href="css/list.css" />
+		<link rel="stylesheet" type="text/css" href="css/weui.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/jquery-weui.min.css" />
+		<style type="text/css">
+			.container {
+				padding: 3%;
+			}
+			
+			#orderPraise {
+				width: 100%;
+				height: 100%;
+				position: relative;
+			}
+			
+			.btn_group {
+				width: 94%;
+				margin-left: 3%;
+				position: absolute;
+				bottom: 40px;
+			}
+			
+			button {
+				height: 40px;
+			}
+			
+			.praise_successCon {
+				height: 200px;
+				border-radius: 5px;
+				background: #fff;
+				text-align: center;
+				color: #00BBD7;
+				font-size: 14px;
+				line-height: 24px;
+			}
+			.praise_choiceCon {
+				width: 94%;
+				padding: 0 3%;
+				text-align: left;
+				height: 260px;
+				background: #fff;
+				font-size: 16px;
+				line-height: 40px;
+			}
+			.weui-picker-modal .picker-item {
+				font-size: 16px;
+				font-family: "微软雅黑";
+			}
+			.weui-picker-modal .picker-items-col{
+				width: 50%;
+			}
+			.toolbar .picker-button{
+				color: #00BBD7;
+			}
+		</style>
+	</head>
+
+	<body ontouchstart="" style="background: #f2f2f2;">
+		<div id="orderPraise">
+			<!--<div class="headerCon">-->
+				<!--<i class="goBack">返回</i>-->
+				<!--<span>预约时间</span>-->
+			<!--</div>-->
+			<div class="container clearfix">
+				<div class="editor_praise_group clearfix">
+					<textarea id="editor_praise" class='commval' name="editor_praise" rows="" cols="" placeholder="点击输入.."></textarea>
+					<div class="choice_group">
+						<!--日期-->
+						<div class="main_page" style="float: left;">
+							<div class="select_start_date" style="height: 45px;line-height: 45px;">
+								<div class="start_date_right">
+									<input type="text" name="start_date" id="start_date" placeholder="选择日期 >>" readonly="readonly" style="color: #000000;"/>
+								</div>
+							</div>
+						</div>
+                        <!--开始时间-->
+                        <div class="start" style="float: left;display: inline-block;width: 25%;height: 45px;line-height: 45px;">
+                        	<input type="text" class="starttime" placeholder="开始时间 >>" id='picker' style="width: 75px;text-align: center;"/>
+                        </div>
+                        <span style="float: left;font-size: 14px;height: 45px;line-height: 45px;">至</span>
+                        <!--结束时间-->
+                        <div class="end" style="float: left;display: inline-block;width: 30%;height: 45px;line-height: 45px;">
+                        	<input type="text" class="endtime" placeholder="结束时间 >>" id='picker' style="width: 100px;text-align: center;"/>
+                        </div>
+                        <!--end-->
+					</div>
+				</div>
+			</div>
+			<div class="btn_group">
+				<button class="submit_praise_btn">提交</button>
+			</div>
+		</div>
+		<div class="modal success_modal">
+			<div style="padding: 0 14px;position: absolute;bottom: 30px;width: 92%;">
+				<div class="praise_successCon">
+					<div class="praise_success">
+						<img src="img/praise_success@2x.png" style="width: 48px;height: 48px;margin-top: 50px;" />
+						<p>提交成功</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>
+<script src="js/fastclick.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.1.4.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-weui.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/mcfish.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	// 获取工单号
+	var workNo = null;
+	var myUrl	= parseURL(location.href);
+	workNo = myUrl.params['workNo'];
+	var time = myUrl.params['time']
+	console.log(workNo);
+	$(function() {
+		FastClick.attach(document.body);
+//		userid
+			var uid  = $.cookie("uid");
+		//预约时间
+//		$("#start_date").val(time)
+		$(".submit_praise_btn").on("click",function(){
+			var content = $(".commval").val();
+			var year = $("#start_date").val();
+			console.log(year)
+			var start = $(".starttime").val();
+			var end = $(".endtime").val();
+			var data = year +" " +start+" "+"至"+" "+end;
+			console.log(data);
+			var start_num=Number(start.split(':')[0]);
+			var end_num=Number(end.split(':')[0]);
+			//预约时间
+			if(content=='') {
+				alert('请填写备注！');
+				return
+			}else if(year==''||start==''||end==''){
+				alert('请选择完整的时间');
+				return
+			}else if(start_num>=end_num){
+				alert('结束时间应大于开始时间');
+				return
+			}
+			get_appoint_workSheet(workNo,data,content,uid,function(data){
+				var data = JSON.parse(data);
+				console.log(data)
+				if(data.status==0){
+					alert("提交成功");
+                    window.location.href='unOrder.html';
+				}else{
+					alert("提交失败")
+				}
+			})
+			
+		})
+		
+		//end
+		
+	});
+	$(".goBack").click(function(){
+		history.back()
+	})
+	if(time) {
+		$("#start_date").val(time)
+	}else {
+		$("#start_date").datetimePicker({
+			title:'选择日期',
+			min:'1900-1-1',
+			max:'2100-12-31',
+			times: function () {
+				return [  // 自定义的时间
+	
+				];
+			},
+		});
+	}
+</script>
+<!--日期-->
+<script type="text/javascript">
+//	var current_date=new Date();
+//    var current_mouth=current_date.getMonth()+1;
+//	var min_date=current_date.getFullYear()+'-'+current_mouth+'-'+current_date.getDate();
+//	console.log(min_date);
+//	var calendar = new datePicker();
+//	calendar.init({
+//		'trigger': '#start_date',
+//		/*按钮选择器，用于触发弹出插件*/
+//		'type': 'date',
+//		/*模式：date日期；datetime日期时间；time时间；ym年月；*/
+//		'minDate': '1900-1-1',
+//		/*最小日期*/
+//		'maxDate': '2100-12-31',
+//		/*最大日期*/
+//		'onSubmit': function() { /*确认时触发事件*/
+//			var theSelectData = calendar.value;
+//		},
+//		'onClose': function() { /*取消时触发事件*/ }
+//	});
+//	$("#start_date").datetimePicker({
+//		title:'选择日期',
+//		min:'1900-1-1',
+//		max:'2100-12-31',
+//		times: function () {
+//			return [  // 自定义的时间
+//
+//			];
+//		},
+//	});
+</script>
+<!--开始时间-->
+<script>
+$(".start #picker").picker({
+  title: "选择开始时间",
+  cols: [
+    {
+      textAlign: 'center',
+      values: ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00']
+    }
+  ]
+});
+</script>
+<!--结束时间-->
+<script>
+$(".end #picker").picker({
+  title: "选择结束时间",
+  cols: [
+    {
+      textAlign: 'center',
+      values: ['9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00']
+    }
+  ]
+});
+</script>

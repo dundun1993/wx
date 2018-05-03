@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>已约工单</title>
+		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<link rel="stylesheet" type="text/css" href="css/list.css" />
+		<style type="text/css">
+			.container {
+				padding: 3%;
+			}
+			.callSenderBtn,.cancelInstallBtn,.completed_Btn{
+				width: 100%;
+				margin-top: 20px;
+				height: 40px;
+			}
+		</style>
+	</head>
+
+	<body ontouchstart="" style="background: #f2f2f2;">
+		<div id="order">
+			<div class="headerCon">
+				
+			</div>
+			<div class="container clearfix">
+				<div class="listCon">
+					<div class="list_info">
+						<div class="top">
+							<span class="lf workNo-num" style="color: #495060;">工单号： <i>545858986454</i></span>
+							<span class="lr" style="color: #ffba00;">已约订单</span>
+						</div>
+						<div class="box">
+							
+						</div>
+						<!--<div class="middle border_bottom clearfix">
+							<p>工程单号: <i>545858986454</i></p>
+							<p class="clearfix"><span class="lf">订单详细:</span> <i style="float: left;width: 150px;overflow: hidden;">234957665</i><img src="img/right_icon2x.png" style="float: right;width: 8px;height: auto;" /></p>
+							<p>顾客姓名： <i>李小明</i></p>
+							<p>联系方式： <i>13437756085</i></p>
+							<p>地址： <i>深圳市大兴路广发社区6栋602</i></p>
+							<p>时间： <i>7月2日  9:00</i></p>
+							<p style="word-break: break-all;word-wrap: break-word;">备注： <i>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</i></p>
+						</div>-->
+					</div>
+				</div>
+				<div class="btn_group">
+					<button class="callSenderBtn" onclick="callphone()" style="margin-right: 12px;">呼叫客户</button>
+					<button class="cancelInstallBtn" onclick="cancelinstall()">取消安装</button>
+					<button class="completed_Btn" onclick="complete_order()">完成订单</button>
+				</div>
+			</div>
+			<div class="modal">
+				<div style="padding: 0 14px;position: absolute;bottom: 30px;width: 92%;">
+					<div class="callCon">
+						<p class="border_bottom">400-300-8888</p>
+						<a href="tel:4003008888"><img src="img/call_icon@2x.png" style="width: 16px;height: 16px;margin-right: 6px;" />呼叫</a>
+					</div>
+					<div class="cancle">取消</div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>
+<script src="js/fastclick.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.1.4.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/mcfish.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	// 获取工单号
+	var workNo = null;
+	var telphone = null;
+	var myUrl	= parseURL(location.href);
+	workNo = myUrl.params['workNo'];
+	console.log(workNo);
+	$(".workNo-num").text(workNo);
+		$(function() {
+			FastClick.attach(document.body);
+			
+			//获取订单详情
+			get_worksheet_detail(workNo,2,function(data){
+				var data = JSON.parse(data);
+				console.log(data);
+				if(data.status==0){
+					var worksheetdetail = data.data;
+					var datas = worksheetdetail.workDetails;
+					console.log(datas);
+					for(var i in datas){
+						telphone = datas[i].customePhone;
+						$str="";
+						$str+="<div class='middle border_top clearfix'>";
+						if(datas[i].boxno==undefined){
+							$str+="<p>工程单号: <i></i></p>";
+						}else{
+							$str+="<p>工程单号: <i>"+datas[i].boxno+"</i></p>";
+						}
+						if(datas[i].comm==undefined){
+						     $str+="<p class='clearfix'><span class='lf'>订单详细:</span> <i style='float: left;width: 150px;overflow: hidden;'></i>" +
+//									 "<img src='img/right_icon2x.png' style='float: right;width: 8px;height: auto;' />" +
+									 "</p>";
+						}else{
+						    $str+="<p class='clearfix'><span class='lf'>订单详细:</span> <i style='float: left;width: 150px;overflow: hidden;'>"+datas[i].comm+"</i>" +
+//									"<img src='img/right_icon2x.png' style='float: right;width: 8px;height: auto;' />" +
+									"</p>";
+						}
+						if(datas[i].customeName==undefined){
+							$str+="<p>顾客姓名： <i></i></p>";
+						}else{
+							$str+="<p>顾客姓名： <i>"+datas[i].customeName+"</i></p>";
+						}
+						if(datas[i].customePhone==undefined){
+							$str+="<p>联系方式： <i></i></p>";
+						}else{
+							$str+="<p>联系方式： <i>"+datas[i].customePhone+"</i></p>";
+						}
+						if(datas[i].address==undefined){
+							$str+="<p>地址： <i></i></p></div>";
+						}else{
+							$str+="<p>地址： <i>"+datas[i].address+"</i></p></div>";
+						}
+						$str+="<p>工单日期： <i class='text-time'></i></p>";
+						if(datas[i].appointTime==undefined){
+							$str+="<p>预约时间： </p>";
+						}else{
+							$str+="<p>预约时间： <i>"+datas[i].appointTime+"</i></p>";
+						}
+						if(datas[i].report==undefined){
+							$str+="<p style='display:none;'>备注： <i></i></p>";
+						}else{
+							$str+="<p>备注： <i>"+datas[i].report+"</i></p>";
+						}
+						$(".box").append($str);
+					}
+					
+			//时间戳
+            for(var i in datas){
+		          var creattime = datas[i].createTime;
+		          var d = getDate(creattime);
+		          $(".text-time").each(function(index,element){
+		          	  if(index==i){
+		          	  	var _type= "<span>"+d+"</span>";
+		                $(_type).appendTo($(this));
+		          	  }
+		          })
+	           }
+//	        //时间戳方法
+	            function add0(m){return m<10?'0'+m:m };
+	            function getDate(shijianchuo) {
+					  //shijianchuo是整数，否则要parseInt转换
+					  var time = new Date(shijianchuo);
+					  var y = time.getFullYear();
+					  var m = time.getMonth()+1;
+					  var d = time.getDate();
+					  var h = time.getHours();
+					  var mm = time.getMinutes();
+					  var s = time.getSeconds();
+					  return y+'-'+add0(m)+'-'+add0(d);
+					};
+					
+				}
+			})
+			
+		//end	
+		});
+		
+		//呼叫客户
+		function callphone(){
+			ModalClick.on();
+			var callNum = "tel:" + telphone;
+	        $('.callCon').children().eq(0).html(telphone).next().attr('href', callNum);
+		}
+		//完成订单
+		function complete_order(){
+//			var workNo = $(e).data("id");
+//			console.log(workNo);
+			//完成订单
+			get_complete_worksheet(workNo,function(data){
+				var data = JSON.parse(data);
+				console.log(data);
+				if(data.status==0){
+//					var complete = data.data;
+//					var datas = complete.workSheetList;
+                    window.location.href='chioceMaterials.html?workNo='+workNo;
+//					var lineNo = ["aa"];
+//					for(var i in datas){
+//						lineNo.push(datas[i].lineNo);
+//						console.log(lineNo);
+//						window.location.href = 'chioceMaterials.html?lineNo='+lineNo;
+//					}
+					
+				}
+				
+			})
+		}
+		//取消安装
+		function cancelinstall(){
+			window.location.href = 'cancle_install.html?workNo='+workNo;
+		}
+
+		//call modal
+		var ModalClick = {
+			
+			on: function() {
+				$(".modal").css({
+					display: 'block'
+				}).stop().animate({
+					opacity: 1
+				}, 600)
+			},
+			off: function() {
+				$(".modal").stop().animate({
+					opacity: 0
+				}, 800, function() {
+					$(this).css({
+						display: 'none'
+					})
+				})
+			}
+		}
+
+		function MyData() {
+			this._init();
+		}
+		MyData.prototype = {
+			//初始化
+			_init: function() {
+				this.callSender();
+			},
+			//呼叫配送员
+			callSender: function() {
+				$(".callSenderBtn").click(function() {
+					ModalClick.on();
+				})
+				$(".cancle").click(function() {
+					ModalClick.off()
+				})
+			}
+		}
+		new MyData();
+</script>

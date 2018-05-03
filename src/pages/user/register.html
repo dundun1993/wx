@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>共享摄影灯</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<link rel="stylesheet" href="../../css/weui.min.css">
+	<link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/less.css">
+</head>
+
+<body>
+	<div class="container-fluid login-form">
+		<div class="row">
+			<div class="weui-msg">
+				<div class="weui-msg__icon-area"><img src="../../images/logo.png" style="width: 125px;"></div>
+			</div>
+			<form class="login-text">
+				<!--1-->
+				<div class="weui-cells login-top">
+					<div class="weui-cell">
+						<div class="weui-cell__bd login-phone">
+							<input class="weui-input" id="phone" type="text" placeholder="输入您的账号" maxlength="11">
+						</div>
+					</div>
+				</div>
+				<div class="weui-cells login-btm" style="display:none;">
+						<div class="weui-cell">
+							<div class="weui-cell__bd login-btm-phone">
+								<input class="weui-input" id="pwd" type="password" placeholder="请输入密码" maxlength="16">
+							</div>
+						</div>
+					</div>
+				<!--2-->
+				<div class="weui-cells login-btm">
+					<div class="weui-cell">
+						<div class="weui-cell__bd login-btm-phone">
+							<input class="weui-input" id="code" type="text" placeholder="请输入验证码">
+							<input type="button" id="sendCode" value=" 获取验证码？">
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="row login-btn">
+			<div class="container">
+				<div>
+					<a href="javascript:;" id="login" class="we-btn weui-btn weui-btn_primary">手机号注册登录</a>
+				</div>
+			</div>
+			<div class="row" style="display:none;">
+				<div class="login-btn-word">或</div>
+			</div>
+			<div class="container" style="display:none;">
+				<div>
+					<a href="javascript:;" id="pwd" class="we-btn weui-btn weui-btn_primary">密码登录</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="../../js/jquery1.11.3.min.js"></script>
+	<script src="../../js/md5.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+	<script src="../../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../js/mcfish.js"></script>
+	<script>	
+		$(function(){
+			var $http = mcfish.API;
+			var $tools = mcfish.Tools
+			var tel = 0;
+			var pwd = 0;
+			var incode = 0;
+			// var code = 0;//返回数据
+
+			$('#sendCode').on('touchend', function () {
+				tel = $('#phone').val();
+				if (!$tools.isTel(tel)){
+					alert('请输入正确的手机号码');
+					return
+				}
+				$http.getPhonecode(tel, '4', function(res){
+					if (res.status == 110 || res.status == 0){
+						// code = res.data.code;
+						alert('短信验证码2分钟之内有效')
+					}
+					else {
+						alert(res.resmsg)
+					}
+				})
+			})
+
+			$('#login').click(function(){
+				tel = $('#phone').val();  // 输入手机号
+				// pwd = hex_md5($('#pwd').val()).toString() || null;  // 输入密码
+				pwd = null;
+				incode = $('#code').val();  // 输入的验证码
+				if (!$tools.isTel(tel)){
+					alert('请输入正确的手机号码');
+					return
+				}
+				// if (pwd == ''){
+				// 	alert('请输入密码')
+				// 	return
+				// }
+				if (incode == '') {
+					alert('请输入正确验证码');
+					return
+				}
+				$http.bindPhone(tel, pwd, incode, function (res){
+					// 绑定身份
+					if (res.status === 0 ){
+						setTimeout(function(){
+							window.history.go(-1);
+							return false
+						},1000)
+					}
+					else {
+						alert(res.resmsg)
+					}
+				})
+			})
+		})
+	</script>
+</body>
+</html>

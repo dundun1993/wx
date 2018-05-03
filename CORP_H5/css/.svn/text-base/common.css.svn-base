@@ -1,0 +1,183 @@
+body{
+	font-family: "微软雅黑";
+	color: #495060;
+	font-size: 14px;
+	position: relative;
+}
+input{
+	border: none;
+	outline: none;
+	background: none;
+}
+textarea{
+	border: none;
+	outline: none;
+	background: none;
+	resize: none;
+	box-sizing: border-box;
+	color: #495060;
+	font-family: "微软雅黑";
+	border: 1px solid #eee;
+	padding: 6px;
+}
+textarea:focus {
+	border: 1px solid #00BBD7;
+}
+button{
+	border: none;
+	outline: none;
+	background: none;
+}
+.headerCon{
+	width: 100%;
+	height: 6%;
+	line-height: 40px;
+	text-align: center;
+	background: #36353b;
+	color: #fff;
+	position: relative;
+}
+.headerCon span{
+	font-size: 16px;
+}
+.headerCon i{
+	position: absolute;
+	left: 0;
+	padding-left: 10px;
+}
+.headerCon a{
+	position: absolute;
+	color: #fff;
+	right: 10px;
+}
+.container{
+	position: relative;
+	margin: 0 auto;
+}
+.clearfix:after {
+    content: "";
+    display: block;
+    height: 0;
+    clear: both;
+}
+.clearfix {
+    zoom: 1;
+}
+.border_bottom{
+	border-bottom: 1px solid #e9eaec;
+}
+.border_top{
+	border-top: 1px solid #e9eaec;
+}
+.border_left{
+	border-left: 1px solid #e9eaec;
+}
+.border_right{
+	border-right: 1px solid #e9eaec;
+}
+.position_middle{
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+}
+
+.lf{
+	float: left;
+}
+.lr{
+	float: right;
+}
+/*modal*/
+
+.modal {
+	display: none;
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	background: rgba(7, 17, 27, 0.6);
+	z-index: 2;
+}
+			
+.callCon,.payCon {
+	border-radius: 5px;
+	background: #fff;
+	padding: 0 4%;
+	line-height: 40px;
+	font-size: 16px;
+	text-align: center;
+}
+			
+.callCon a {
+	color: #00BBD7;
+}
+			
+.cancle {
+	margin-top: 20px;
+	border-radius: 5px;
+	background: #fff;
+	line-height: 40px;
+	font-size: 16px;
+	text-align: center;
+	color: #00BBD7;
+}
+.payCon .title{
+	color: #00BBD7;
+}
+.payCon .payContent{
+	line-height: 80px;
+}
+.payCon .canclePay{
+	color: #00BBD7;
+}
+.payCon .certainPay{
+	color: #ffba00;
+}
+.payCon span{
+	display: inline-block;
+	width: 46%;
+	box-sizing: border-box;
+}
+.modal_Img {
+	display: none;
+	opacity: 0;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	background: rgba(7, 17, 27, 0.8);
+	z-index: 2;
+}
+.modal_Img img{
+	position: absolute;
+	width: 100%;
+	height: auto;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+}
+/*placeholder*/
+input::-webkit-input-placeholder { /* WebKit browsers */
+　　color:#999;
+}
+input:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+　　color:#999;
+}
+input::-moz-placeholder { /* Mozilla Firefox 19+ */
+　　color:#999;
+}
+input:-ms-input-placeholder { /* Internet Explorer 10+ */
+　　color:#999;
+}
+table{
+	border: none;
+	border-collapse: collapse;
+}

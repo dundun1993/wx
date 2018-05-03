@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>选择材料</title>
+		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<link rel="stylesheet" type="text/css" href="css/list.css" />
+		<link rel="stylesheet" type="text/css" href="css/weui.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/jquery-weui.min.css" />
+		<style type="text/css">
+			.container {
+				padding: 3%;
+			}
+			
+			.list_info .top .check_default {
+				float: left;
+				margin-top: 10px;
+				margin-right: 10px;
+				width: 20px;
+				height: 20px;
+				background-size: 100%;
+			}
+			
+			.check_default {
+				background: url(img/check_default@2x.png);
+			}
+			
+			.check_active {
+				background: url(img/check_active@2x.png);
+			}
+			
+			table {
+				font-size: 14px;
+				width: 100%;
+				text-align: left;
+				line-height: 40px;
+			}
+			
+			table tr {
+				border-bottom: 1px solid #e9eaec;
+			}
+			
+			table th {
+				width: 25%;
+				color: #00BBD7;
+			}
+			input{
+				color: #80848f;
+				line-height: 40px;
+			}
+			table td {
+				width: 25%;
+			}
+			
+			table img {
+				width: 22px;
+				height: auto;
+				vertical-align: middle;
+			}
+			
+			button {
+				margin-top: 20px;
+				height: 45px;
+			}
+			
+			.praise_choiceCon {
+				width: 94%;
+				padding: 0 3%;
+				text-align: left;
+				height: 260px;
+				background: #fff;
+				font-size: 16px;
+				line-height: 40px;
+			}
+			
+			.weui-picker-modal .picker-item {
+				font-size: 16px;
+				font-family: "微软雅黑";
+			}
+			
+			.weui-picker-modal .picker-items-col {
+				width: 50%;
+			}
+			.shuliang{
+				font-size: 15px;
+			}
+		</style>
+	</head>
+
+	<body ontouchstart="" style="background: #f2f2f2;">
+		<div id="orderDetail">
+			<!--<div class="headerCon">-->
+				<!--<i class="goBack">返回</i>-->
+				<!--<span>选择材料</span>-->
+			<!--</div>-->
+			<div class="container clearfix">
+				<div class="box">
+					
+				</div>
+				<!--<div class="list_info" style="margin-bottom: 20px;">
+					<div class="top border_bottom ">
+						<i class="check_default"></i>
+						<span class="lf">工程单号： <em>545858986454</em></span>
+					</div>
+					<div class="middle  clearfix">
+						<table border="" cellspacing="0" cellpadding="0">
+							<tr>
+								<th>材料</th>
+								<th>单价</th>
+								<th>数量</th>
+								<th>小计</th>
+							</tr>
+							<tr class="materials_info">
+								<td>空调管</td>
+								<td>28.00</td>
+								<td class="countInput"><input style="width: 100%;" maxlength="3" type="text" name="" id="" value="1" /></td>
+								<td>￥28.00</td>
+							</tr>
+							<tr class="add_materials">
+								<td colspan="4" style="text-align: center;"><img src="img/addBtn@2x.png" /></td>
+							</tr>
+						</table>
+					</div>
+					<p style="line-height: 36px;text-align: right;font-size: 14px;">总金额： <i style="color: #ffba00;">￥998.00</i></p>
+				</div>-->
+				<div class="btn_group">
+					<button class="wechatPayBtn" style="width: 100%;">提交材料</button>
+					<!--<button class="cashPayBtn">(现金支付)提交</button>-->
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+<script src="js/fastclick.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.1.4.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-weui.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/mcfish.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	// 获取lineno
+	var workNo = null;
+	//工程单号
+	var Boxno = null;
+	//线路码
+	var lineNo = null;
+	var num = 0;
+	//材料名
+	var materialname = [];  
+	//单价
+	var materialmoney = [];
+	//提交材料
+	var arr2 = [];
+	//总的材料数组
+	var arr3 = [];
+    //总的工程单号用逗号在一起
+    var totalBoxno='';
+    //无重复的工单号数组
+    var totalBoxno2='';
+    //有重复的工单号数组
+    var totalBoxno3=[];
+	var myUrl	= parseURL(location.href);
+	workNo = myUrl.params['workNo'];
+	console.log(workNo);
+	//userid
+			var uid  = $.cookie("uid");
+	$(function() {
+		FastClick.attach(document.body);
+
+		//通过工单号查询线路码
+		get_complete_worksheet(workNo,function(data){
+			var data = JSON.parse(data);
+			console.log(data);
+			if(data.status==0){
+				var complete = data.data;
+				var datas = complete.workSheetList;
+                console.log(datas)
+				for(var i in datas){
+					$str="";
+					$str+="<div class='list_info getVal"+i+"' data-val='"+i+"' style='margin-bottom: 20px;'><div class='top border_bottom '>";
+//					$str+="<i class='check_default' onclick='checkOrder($(this), checkFlag);'></i>";
+                    $str+="<input type='hidden' name='' id='test' value='"+i+"' />";
+                    $str+="<input type='checkbox' data-id='ischecked' class='check_default che"+i+"' name='checkbox1' id='s11' checked='checked'>";
+					$str+="<span class='lf'>工程单号： <em class='boxnonum'>"+datas[i].boxno+"</em></span></div>";
+					$str+="<div class='middle  clearfix'><table border='' cellspacing='0' cellpadding='0'>";
+					$str+="<tr><th>材料</th>";
+					$str+="<th>单价</th><th>数量</th><th>小计</th></tr>";
+//					$str+="<td class='cailiao'>空调管</td>";
+//					$str+="<td class='danjia'>28.00</td>";
+//					$str+="<td class='countInput'><input class='shuliang' style='width: 100%;' maxlength='3' type='text' name='' id='' value='1' /></td>";
+					$str+="<tr class='add_materials'>";
+					$str+="<td colspan='4' style='text-align: center;'><img data-id='"+datas[i].lineNo+"' onclick='chooseMaterial(this)' src='img/addBtn@2x.png' data-gdh='"+datas[i].boxno+"'/></td></tr></table></div>";
+					$str+="<p style='line-height: 36px;text-align: right;font-size: 14px;'>总金额： <i data-id='"+num+"' style='color: #ffba00;'>￥00.00</i></p></div>";
+					//修改：在i标签里边增加一个data-id="num",给每个“工单号”下的“工程单号”一个序号。
+                    $(".box").append($str);
+					num++;
+					console.log(num);
+				}
+				var Datas2 = JSON.parse(localStorage.getItem(workNo))
+				if(Datas2) {
+					for (var i = 0;i < Datas2.length;i++) {
+						getValue(Datas2[i].inx[0],Datas2[i].m,Datas2[i].inx[0])
+					}
+				}
+			}
+		})
+	});
+		//通过线路吗选择材料
+		function chooseMaterial(e){
+			//线路码
+			var lineNo = $(e).data("id");
+		    //工程单号
+			Boxno = $(e).data("gdh");
+			get_material(lineNo,1,function(data){
+				var data = JSON.parse(data);
+			    console.log(data);
+			    if(data.status==0){
+			    	var material = data.data;
+				    var datas = material.materialList;
+				    var arr = [];
+				    var arr1 = [];
+				    for(var i in datas){
+				    	//材料名
+//				    	materialname = datas[i].name;
+				    	arr.push(datas[i].name);
+
+				    	//单价
+				    	arr1.push(datas[i].price);
+				    }
+				    materialname = arr;
+				    materialmoney = arr1;
+			    }
+			      pickers(e);
+			})
+		}
+		
+		//点击提交材料
+		$(".wechatPayBtn").on("click",function(){
+			 		
+                var materials = [];
+                var material = [];
+                var allDate = [];
+                                                 //修改：增加一个条件判断，只提交一次工单号
+                for(var i=0;i<=num;i++){
+                    var checkedbox = $(".che"+i+"");
+                    if((checkedbox).is(':checked')){
+//					console.log("选中");
+
+                        //将选中的数组加入到需要传的数据里面去
+                        $(".materials_info"+i+"").each(function(index,ele){
+                            var boxnonum = $(this).parent().parent().parent().parent().find(".boxnonum").text();
+
+                            var material5 = {};
+                            var whId = workNo;
+                            var maName = $(ele).find(".cailiao").text();
+                            var nums = $(ele).find(".shuliang").val();
+                            var priceStr = $(ele).find(".danjia").text()
+                            var boxno = boxnonum;
+                           	totalBoxno3.push(boxno);//将工程单号放入数组
+                           	keepData = {m:[maName,priceStr,nums,boxno],inx:[i]};
+                            material5 = {"whId":whId,"maName":maName,"nums":nums,"priceStr":priceStr,"boxno":boxno};
+                            material.push(material5);
+                            allDate.push(keepData);
+                        });
+                        //materials.push(material);
+                        //   arr3.push(materials);
+                    }
+                }
+                //对totalBoxno3数组去重
+
+                Array.prototype.unique = function(){
+                    var res = [];
+                    var json = {};
+                    for(var i = 0; i < this.length; i++){
+                        if(!json[this[i]]){
+                            res.push(this[i]);
+                            json[this[i]] = 1;
+                        }
+                    }
+                    return res;
+                }
+                totalBoxno2=totalBoxno3.unique();
+                if(totalBoxno2.length==1){
+                    totalBoxno=totalBoxno2[0];
+                    console.log(totalBoxno);
+                }else{
+                    totalBoxno=totalBoxno2.join(',');
+                    console.log(totalBoxno);
+                }
+//            totalBoxno2=totalBoxno.substring(0,totalBoxno.length-1);
+//            console.log(totalBoxno2);
+//            console.log(totalBoxno2.length);
+//			var saveDataAry=[];  
+//	        var data1 = { "whId": "111", "maName": "螺丝钉" , "nums": "5" , "priceStr": "10.09", "boxno": "222"};
+//			var data2 = { "whId": "333", "maName": "傻逼" , "nums": "15" , "priceStr": "20.1", "boxno": "222"};
+//	        saveDataAry.push(data1);  
+//	        saveDataAry.push(data2);
+			
+			//提交材料
+			console.log(material)
+			localStorage.setItem(workNo,JSON.stringify(allDate))
+			var Datas = JSON.parse(localStorage.getItem(workNo))
+			console.log(Datas)
+				get_submit_workmaterial(material,uid,function(data){
+					console.log(data);
+                    var data = JSON.parse(data);
+                    if(data.status==0){
+                        if(totalBoxno.length>=7){
+                            window.location.href='orderPay.html?totalBoxno='+totalBoxno;
+                        }
+                    }
+
+				})
+		})
+		//保存材料
+		function saveMaterial() {
+			var materials = [];
+            var material = [];
+            var allDate = [];
+                                             //修改：增加一个条件判断，只提交一次工单号
+            for(var i=0;i<=num;i++){
+                var checkedbox = $(".che"+i+"");
+                if((checkedbox).is(':checked')){
+//					console.log("选中");
+
+                    //将选中的数组加入到需要传的数据里面去
+                    $(".materials_info"+i+"").each(function(index,ele){
+                        var boxnonum = $(this).parent().parent().parent().parent().find(".boxnonum").text();
+
+                        var material5 = {};
+                        var whId = workNo;
+                        var maName = $(ele).find(".cailiao").text();
+                        var nums = $(ele).find(".shuliang").val();
+                        var priceStr = $(ele).find(".danjia").text()
+                        var boxno = boxnonum;
+                       	totalBoxno3.push(boxno);//将工程单号放入数组
+                       	keepData = {m:[maName,priceStr,nums,boxno],inx:[i]};
+                        material5 = {"whId":whId,"maName":maName,"nums":nums,"priceStr":priceStr,"boxno":boxno};
+                        material.push(material5);
+                        allDate.push(keepData);
+                    });
+                    //materials.push(material);
+                    //   arr3.push(materials);
+                }
+            }
+            //对totalBoxno3数组去重
+
+            Array.prototype.unique = function(){
+                var res = [];
+                var json = {};
+                for(var i = 0; i < this.length; i++){
+                    if(!json[this[i]]){
+                        res.push(this[i]);
+                        json[this[i]] = 1;
+                    }
+                }
+                return res;
+            }
+            totalBoxno2=totalBoxno3.unique();
+            if(totalBoxno2.length==1){
+                totalBoxno=totalBoxno2[0];
+                console.log(totalBoxno);
+            }else{
+                totalBoxno=totalBoxno2.join(',');
+                console.log(totalBoxno);
+            }
+            //提交材料
+			console.log(material)
+			localStorage.setItem(workNo,JSON.stringify(allDate))
+			var Datas = JSON.parse(localStorage.getItem(workNo))
+			console.log(Datas)
+		}
+	
+	$(".goBack").click(function() {
+		history.back()
+	})
+	//计算小计
+	function littlePrice($el){
+		var count = $el.val();
+		var price = $el.parent().prev().html();
+		if(count==="0"){
+			count = 1;
+			$el.val(count)
+		}
+		var tottlePrice = count * price;
+		var text = "￥"+parseFloat(tottlePrice).toFixed(2)+'<img onclick=delTr(this) style="float:right;margin-top:9px;bottom;width:25%;" src="img/delete.png"/>';
+		$el.parent().next().html(text);
+	}
+
+	//获取材料小计并计算总金额
+	function tottlePrice(vals) {
+//		var $price = $(".tottlemoney_class");//将.materials_info换为.tottlemoney_class
+		var $i = $(".getVal"+vals+" p i");
+        //获取每个工程单号下的.tottlemoney_class
+        var $price=$(".getVal"+vals+" p i").parent().prev().find(".tottlemoney_class");
+		var tottle_price = 0;
+		for(var i = 0; i < $price.length; i++) {
+			tottle_price += parseFloat($price.eq(i).children().eq(3).html().split('￥')[1])
+		}
+		$i.html("￥" + tottle_price.toFixed(2))
+	}
+	tottlePrice();
+
+	var chioceFlag = true; // 选择材料开关
+	function cancleChoice() { // 取消选择材料
+		chioceFlag = false;
+		$.closePicker();
+	}
+
+	function confirmChioce() { //确认选择材料本
+		chioceFlag = true;
+		$.closePicker();
+	}
+
+	//获取选择材料
+	function getValue(index,val,vals) {
+		if(chioceFlag) {
+			var td = '';
+			var little_price = parseFloat(val[1] * val[2]).toFixed(2);
+				td += "<td class='cailiao'>" + val[0] + "</td>";
+				td += "<td class='danjia'>" + val[1] + "</td>";
+				td += "<td class='countInput'><input class='shuliang' style='width: 100%;' maxlength='3' type='text' value="+val[2]+" /></td>";
+			var tr = "<tr class='tottlemoney_class materials_info"+index+"'>" + td + "<td style='overflow:hidden;'>￥" + little_price +'<img onclick=delTr(this) style="float:right;margin-top:9px;bottom;width:25%;" src="img/delete.png"/>'+ "</td></tr>";
+            //修改：增加一个tottlemoney_class类名，因为在tottlePrice();里面，$price = $(".materials_info")，$price.length始终为0；
+			$(".getVal"+vals+" .add_materials").before(tr)
+			tottlePrice(vals);
+		}
+	}
+	//删除本行材料
+	function delTr(obj) {
+		var param=$(obj).parent().parent().parent().parent().parent().parent().find("i").data("id");//修改：定义一个常量param等于所属工单号下的i标签的data-id;
+		$(obj).parent().parent().remove();
+		tottlePrice(param);
+		saveMaterial()
+	}
+	//打开picker
+	function pickers(e){
+		var index = $(e).parent().parent().parent().parent().parent().parent().find("#test").val();
+		var vals=$(e).parent().parent().parent().parent().parent().parent().data("val");
+			$(e).picker({
+			toolbarTemplate: "<div class='control border_bottom clearfix'>" +
+				"<span class='cancelBtn lf' onclick='cancleChoice()'>取消</span>" +
+				"<span class='confirmBtn lr'  style='color: #00BBD7;' onclick='confirmChioce()'>确定</span>" +
+				"</div>",
+			cols: [{
+					textAlign: 'left',
+					fontSize: '16px',
+					values: materialname
+				},
+				{
+					textAlign: 'center',
+					fontSize: '16px',
+					values: materialmoney
+				},
+				{
+					textAlign: 'right',
+					fontSize: '16px',
+					values: ['1', '2', '3', '4']
+				}
+			],
+			cssClass: 'praise_choiceCon',
+            onChange:function(result) {
+                //材料改变时，设置相应的价格
+                var variable=0;//直接通过获取第一个数组的index值来设置第二个数组的transform
+                for(i=0;i<materialname.length;i++){
+                    if(result.value[0]==materialname[i]){
+                        result.value[1]=materialmoney[i];
+                        variable=i;
+                    }
+                }
+                    console.log(result)
+                var translate_y='';
+                translate_y=92-32*variable;
+                var $div_class=$(".picker-items-col-wrapper");
+//              translate_y=$div_class.eq(0).css('transform').replace(/[^0-9\-,]/g,'').split(',')[5];
+//              translate_y=Math.ceil(translate_y/32)*32-4;
+                $div_class.eq(1).css("transform",'matrix(1, 0, 0, 1, 0,'+ translate_y+')');
+                $div_class.eq(1).children().eq(variable).css('color','#3d4145').siblings().css('color','#9b9b9b');
+//              console.log(result)
+//              var mmm=$div_class.eq(0).css('transform');
+//              console.log(mmm);
+//              translate_y=translate_y+'px';
+//              console.log(translate_y);//matrix(1, 0, 0, 1, 0, 92)矩阵中的92
+            } ,
+			onClose: function(picker) {
+				getValue(index,picker.value,vals);
+			    //材料数组
+			    arr2 = picker.value;
+			    arr2.push(Boxno);
+			    arr2.push(workNo);
+                $(".opacity_div").remove()
+                saveMaterial()
+			}
+		})
+			$(e).picker("open");
+//      打开picker时添加一个空白div,关闭时移除
+		var picker_high = $(".picker-items-col-center").parent().parent().height()+'px';
+		var picker_width= $(".picker-items-col-center").width()+'px';
+        var opacity_div_left=($(document).width()-$(".picker-items-col-center").width())/2+'px';
+		opacity_div = "<div class='opacity_div' style='width:"+picker_width+";height:"+ picker_high+";position: fixed;bottom: 0;right: "+opacity_div_left+";z-index:2000;'></div>"
+		$("body").append(opacity_div);
+	}
+
+	//输入改变数量;   将table修改为.box,因为table也是新添加的标签要委托更高的祖先元素。
+//	$(".box").on('change','input',function(){
+//		var num = $(this).val().replace(/[^\d]/g, "");
+//		$(this).val(num);
+//		littlePrice($(this));
+//        var param=$(this).parent().parent().parent().parent().parent().parent().find("i").data("id");
+//		tottlePrice(param);
+//	})
+    //修改：去掉change事件
+	$(".box").on('keyup','input',function(){
+		var num = $(this).val().replace(/[^\d]/g, "");
+		$(this).val(num);
+		littlePrice($(this));
+//        console.log($(this).parent().next().html());
+        var param=$(this).parent().parent().parent().parent().parent().parent().find("i").data("id");//修改：定义一个常量param等于所属工单号下的i标签的data-id;
+        tottlePrice(param);//修改：tottlePrice()函数里需要传值，总金额才能随着所选材料金额、数量变化而变化。
+	})
+	
+	var ModalClick = {
+		on: function() {
+			$(".modal").css({
+				display: 'block'
+			}).stop().animate({
+				opacity: 1
+			}, 600)
+		},
+		off: function() {
+			$(".modal").stop().animate({
+				opacity: 0
+			}, 800, function() {
+				$(this).css({
+					display: 'none'
+				})
+			})
+		}
+	}
+	$(".wechatPayBtn").click(function() {
+		ModalClick.on();
+	})
+	$(".canclePay").click(function() {
+		ModalClick.off()
+	})
+</script>

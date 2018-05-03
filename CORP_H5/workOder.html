@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>顺电</title>
+		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<style type="text/css">
+			.container{
+				padding: 12px;
+			}
+			.changeCon{
+				padding: 12px;
+				background: #fff;
+				border-radius: 5px;
+				margin-bottom: 10px;
+			}
+			.changeCon i{
+				float: right;
+				margin-top: 2px;
+				width: 8px;
+				height: 16px;
+				background: url(img/right_icon2x.png) no-repeat 0 0 ;
+				background-size: 100% auto; 
+			}
+			.changeCon img{
+				float: left;
+				width: 22px;
+				height: auto;
+			}
+			.changeCon span{
+				margin-left: 6px;
+				float: left;
+				line-height: 20px;
+			}
+			.changeCon em{
+				display: none;
+				margin-right: 6px;
+				float: right;
+				line-height: 20px;
+				width: 20px;
+				height: 20px;
+				background: #ff3a20;
+				color: #fff;
+				border-radius: 50%;
+				text-align: center;
+			}
+		</style>
+	</head>
+
+	<body ontouchstart="" style="background: #f2f2f2;">
+		<div id="changeTel">
+			<!--<div class="headerCon">
+				<i>返回</i>
+				<span>顺电</span>
+			</div>-->
+			<div class="container">
+				<div class="changeCon workeOrder_now clearfix">
+					<img src="img/workeOrder_now@2x.png"/>
+					<span>当前工单</span>
+					<i></i>
+					<em>2</em>
+				</div>
+				<div class="changeCon workeOrder_history clearfix">
+					<img src="img/workeOrder_history@2x.png"/>
+					<span>历史工单</span>
+					<i></i>
+					<em></em>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>
+<script src="js/fastclick.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.1.4.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	window.onload = function() {
+//        var workerno  = "XiongWenYi";
+		$(function() {
+			FastClick.attach(document.body);
+			// 获取微信用户信息
+			var myUrl	= parseURL(location.href);
+			var code	= myUrl.params['code'];
+
+			if (code != null){
+				query_userinfo_weixin(code);
+			}else{
+				var auth = get_auth_url_weixin(window.location, 'snsapi_privateinfo');
+				window.location = auth;
+			}
+
+			//userid
+			var uid  = $.cookie("uid");
+			$(".workeOrder_history").on('click',function (){
+                window.location.href='historyOrder.html?workerno='+workerno;
+            })
+		});
+		
+	}
+</script>

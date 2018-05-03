@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>取消上门</title>
+		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<link rel="stylesheet" type="text/css" href="css/list.css" />
+		<link rel="stylesheet" type="text/css" href="css/weui.min.css" />
+		<link rel="stylesheet" type="text/css" href="css/jquery-weui.min.css" />
+		<style type="text/css">
+			.container {
+				padding: 3%;
+			}
+			
+			#orderPraise {
+				width: 100%;
+				height: 100%;
+				position: relative;
+			}
+			
+			.btn_group {
+				width: 94%;
+				margin-left: 3%;
+				position: absolute;
+				bottom: 40px;
+			}
+			
+			button {
+				height: 40px;
+			}
+			
+			.praise_successCon {
+				height: 200px;
+				border-radius: 5px;
+				background: #fff;
+				text-align: center;
+				color: #00BBD7;
+				font-size: 14px;
+				line-height: 24px;
+			}
+			.praise_choiceCon {
+				width: 94%;
+				padding: 0 3%;
+				text-align: left;
+				height: 300px;
+				background: #fff;
+				font-size: 16px;
+				line-height: 40px;
+			}
+			.weui-picker-modal .picker-item {
+				font-size: 16px;
+				font-family: "微软雅黑";
+			}
+		</style>
+	</head>
+
+	<body ontouchstart="" style="background: #f2f2f2;">
+		<div id="orderPraise">
+			<!--<div class="headerCon">
+				<i class="goBack">返回</i>
+				<span>取消上门</span>
+			</div>-->
+			<div class="container clearfix">
+				<div class="editor_praise_group clearfix">
+					<textarea id="editor_praise" class='commval' name="editor_praise" rows="" cols="" placeholder="点击输入.."></textarea>
+					<div class="choice_group">
+						快捷语言 <img src="img/right_icon2x.png" />
+					</div>
+				</div>
+			</div>
+			<div class="btn_group">
+				<button class="submit_praise_btn">提交</button>
+			</div>
+		</div>
+		<div class="modal success_modal">
+			<div style="padding: 0 14px;position: absolute;bottom: 30px;width: 92%;">
+				<div class="praise_successCon">
+					<div class="praise_success">
+						<img src="img/praise_success@2x.png" style="width: 48px;height: 48px;margin-top: 50px;" />
+						<p>提交成功</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>
+<script src="js/fastclick.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.1.4.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-weui.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/mcfish.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	// 获取工单号
+	var workNo = null;
+	var myUrl	= parseURL(location.href);
+	workNo = myUrl.params['workNo'];
+	console.log(workNo);
+	$(function() {
+		FastClick.attach(document.body);
+		
+		//取消上门
+		$(".submit_praise_btn").on("click",function(){
+			$.confirm({
+				title: '提示',
+				text: '确定要取消订单？',
+				onOK: function () {
+				    //点击确认
+				   var content = $(".commval").val();
+					console.log(content)
+					get_cancel_worksheet(workNo,content,0,function(data){
+						var data = JSON.parse(data);
+					    if(data.status==0){
+					    	Modal.successModal.on();
+					    	window.location.href = 'unOrder.html';
+					    }else{
+					    	alert("提交失败")
+		//			    	window.location.href = 'unOrder.html';
+					    }
+				    })
+				},
+				onCancel: function () {
+					return;
+				}
+			})
+			
+		})
+//		end
+	});
+	$(".goBack").click(function(){
+		history.back()
+	})
+	var chioceFlag = true; // 选择常用文本开关
+	function cancleChoice() { // 取消选择常用文本
+		//			var text = $("#editor_praise").val()
+		//			setTimeout(function(){
+		//				$("#editor_praise").val(text)
+		//			},0)
+		chioceFlag = false;
+		$.closePicker();
+	}
+
+	function confirmChioce() { //确认选择常用文本
+		chioceFlag = true;
+		$.closePicker();
+	}
+	//常用文本
+	var choiceValue = '';
+
+	function getValue(val) {
+		if(chioceFlag) {
+			$("#editor_praise").val(val);
+		}
+	}
+	// modal
+	var Modal = {
+		successModal: {
+			on: function() {
+				$(".success_modal").css({
+					display: 'block'
+				}).stop().animate({
+					opacity: 1
+				}, 600)
+			},
+			off: function() {
+				$(".success_modal").stop().animate({
+					opacity: 0
+				}, 800, function() {
+					$(this).css({
+						display: 'none'
+					})
+				})
+			}
+		}
+	}
+
+	// 选择常用文本
+	$(".choice_group").picker({
+		toolbarTemplate: "<div class='control border_bottom clearfix'>" +
+			"<span class='cancelBtn lf'  style='color: #00BBD7;' onclick='cancleChoice()'>取消</span>" +
+			"<span class='confirmBtn lr'  style='color: #00BBD7;' onclick='confirmChioce()'>确定</span>" +
+			"</div>",
+		cols: [{
+			textAlign: 'center',
+			fontSize: '16px',
+			values: ['', '非常准时', '服务态度好', '送货速度快', '师傅很有耐心']
+		}],
+		cssClass: 'praise_choiceCon',
+		onClose: function(picker) {
+			choiceValue = picker.value[0];
+			getValue(choiceValue);
+		}
+	})
+
+</script>

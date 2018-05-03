@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>已约工单</title>
+		<link rel="stylesheet" type="text/css" href="css/reset.css" />
+		<link rel="stylesheet" type="text/css" href="css/common.css" />
+		<link rel="stylesheet" type="text/css" href="css/list.css" />
+		<style type="text/css">
+			.container {
+				padding: 3%;
+			}
+			
+		</style>
+	</head>
+
+	<body ontouchstart="" style="background: #f2f2f2;">
+		<div id="order">
+			<!--<div class="headerCon">-->
+				<!--<i>返回</i>-->
+				<!--<span>已约工单</span>-->
+			<!--</div>-->
+			<div class="container clearfix">
+				<div class="listCon">
+					<!--<div class="list_info">
+						<div class="top border_bottom">
+							<span class="lf" style="color: #495060;">客户单号： <i>545858986454</i></span>
+							<span class="lr" style="color: #ffba00;">已约订单</span>
+						</div>
+						<div class="middle border_bottom clearfix">
+							<p>工程单号: <i>545858986454</i></p>
+							<p class="clearfix"><span class="lf">订单详细:</span> <i style="float: left;width: 150px;overflow: hidden;">234957665</i><img src="img/right_icon2x.png" style="float: right;width: 8px;height: auto;" /></p>
+							<p>顾客姓名： <i>李小明</i></p>
+							<p>联系方式： <i>13437756085</i></p>
+							<p>地址： <i>深圳市大兴路广发社区6栋602</i></p>
+							<p>时间： <i>7月2日  9:00</i></p>
+							<p style="word-break: break-all;word-wrap: break-word;">备注： <i>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</i></p>
+						</div>
+						<div class="btn_group">
+							<div class="dsh_btn_group">
+								<button class="callSenderBtn" style="margin-right: 12px;">呼叫客户</button>
+								<button class="cancelInstallBtn">取消安装</button>
+							</div>
+							<button class="completed_Btn">完成订单</button>
+						</div>
+					</div>-->
+				</div>
+			</div>
+			<div class="modal">
+				<div style="padding: 0 14px;position: absolute;bottom: 30px;width: 92%;">
+					<div class="callCon">
+						<p class="border_bottom">400-300-8888</p>
+						<a href="tel:4003008888"><img src="img/call_icon@2x.png" style="width: 16px;height: 16px;margin-right: 6px;" />呼叫</a>
+					</div>
+					<div class="cancle">取消</div>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>
+<script src="js/fastclick.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.1.4.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/mcfish.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	var uid  = "208323";
+
+		$(function() {
+			FastClick.attach(document.body);
+			//先判断是否存在uid
+//	        var myUrl	= parseURL(location.href);
+//	        var code	= myUrl.params['code'];
+//	        if ($.cookie("uid")){
+//	            console.log(1);
+//	        } else if (code != null){
+//	            query_userinfo_weixin(code);
+//	        }else{
+//	            var auth = get_auth_url_weixin(window.location, 'snsapi_privateinfo');
+//	            window.location = auth;
+//	        }
+	             // userid
+	        //var uid  = $.cookie("uid");
+            var arr_workNo=[];
+			get_worksheet(uid,2,1,function(data){
+				var data = JSON.parse(data);
+				if(data.status==0){
+					var worksheet = data.data;
+					var datas = worksheet.workList;
+					console.log(datas);
+                    console.log(datas)
+                    for(i=0;i<datas.length;i++){
+                        arr_workNo.push(datas[i].workNo);
+                    }
+                    console.log(arr_workNo)
+                    //去掉重复的工单号，同时去掉datas中重复的工单号一致工程单号不一样的订单
+                    for (var i = 0; i < arr_workNo.length; i++) {
+                        for (var j = i+1; j < arr_workNo.length; j++) {
+                            if(arr_workNo[i]==arr_workNo[j]){
+                                arr_workNo.splice(j,1);
+                                datas.splice(j,1);
+                                j--;
+                            }
+                        }
+                    }
+                    console.log(arr_workNo)
+					for(var i in datas){
+						$str="";
+						$str+="<div class='list_info'><div class='top border_bottom'>";
+						if(datas[i].workNo==undefined){
+							$str+="<span class='lf' style='color: #495060;'>工单号： <i></i></span>";
+						}else{
+							$str+="<span class='lf' style='color: #495060;'>工单号： <i>"+datas[i].workNo+"</i></span>";
+						}
+						$str+="<span class='lr' style='color: #ffba00;'>已约订单</span></div>";
+						$str+="<div class='middle border_bottom clearfix'>";
+						if(datas[i].boxno==undefined){
+							$str+="<p>工程单号: <i></i></p>";
+						}else{
+							$str+="<p>工程单号: <i>"+datas[i].boxno+"</i></p>";
+						}
+						$str+="<p class='clearfix'><span class='lf'>订单详细:</span> <i style='float: left;width: 150px;overflow: hidden;'>"+datas[i].comm+"</i><img data-id='"+datas[i].workNo+"' onclick='unOrderdetail(this)' src='img/right_icon2x.png' style='float: right;width: 12px;height: auto;' /></p>";
+						if(datas[i].customeName==undefined){
+							$str+="<p>顾客姓名： <i></i></p>";
+						}else{
+							$str+="<p>顾客姓名： <i>"+datas[i].customeName+"</i></p>";
+						}
+						if(datas[i].customePhone==undefined){
+							$str+="<p>联系方式： <i></i></p>";
+						}else{
+							$str+="<p>联系方式： <i>"+datas[i].customePhone+"</i></p>";
+						}
+						if(datas[i].address==undefined){
+							$str+="<p>地址： <i></i></p>";
+						}else{
+							$str+="<p>地址： <i>"+datas[i].address+"</i></p>";
+						}
+                        $str+="<p>工单日期： <i class='text-time'></i></p>";
+						if(datas[i].appointTime==undefined){
+							$str+="<p>预约时间： </p>";
+						}else{
+							$str+="<p>预约时间： <i>"+datas[i].appointTime+"</i></p>";
+						}
+						if(datas[i].report==undefined){
+							$str+="<p style='display:none;'>备注： <i></i></p>";
+						}else{
+							$str+="<p>备注： <i>"+datas[i].report+"</i></p>";
+						}
+						$str+="<div class='btn_group'><div class='dsh_btn_group'>";
+						$str+="<button class='callSenderBtn' style='margin-right: 12px;' data-id='"+datas[i].customePhone+"' onclick='callphone(this)'>呼叫客户</button>";
+						$str+="<button class='cancelInstallBtn' data-id='"+datas[i].workNo+"' onclick='cancelinstall(this)'>取消安装</button></div>";
+						$str+="<button class='completed_Btn' data-id='"+datas[i].workNo+"' onclick='complete_order(this)'>完成订单</button></div></div>";
+						$(".listCon").append($str);
+					}
+					
+			//时间戳
+           for(var i in datas){
+		          var creattime = datas[i].createTime;
+		          var d = getDate(creattime);
+		          $(".text-time").each(function(index,element){
+		          	  if(index==i){
+		          	  	var _type= "<span>"+d+"</span>";
+		                $(_type).appendTo($(this));
+		          	  }
+		          })
+	           }
+	        //时间戳方法
+	            function add0(m){return m<10?'0'+m:m };
+	            function getDate(shijianchuo) {
+					  //shijianchuo是整数，否则要parseInt转换
+					  var time = new Date(shijianchuo);
+					  var y = time.getFullYear();
+					  var m = time.getMonth()+1;
+					  var d = time.getDate();
+					  var h = time.getHours();
+					  var mm = time.getMinutes();
+					  var s = time.getSeconds();
+					  return y+'-'+add0(m)+'-'+add0(d);
+					};
+
+
+				}
+			})
+			
+		});
+		
+		//呼叫客户
+		function callphone(e){
+			var telphone = $(e).data("id");
+			console.log(telphone);
+			ModalClick.on();
+			var callNum = "tel:" + telphone;
+	        $('.callCon').children().eq(0).html(telphone).next().attr('href', callNum);
+		}
+		
+		//取消安装
+		function cancelinstall(e){
+			var workNo = $(e).data("id");
+			console.log(workNo);
+			window.location.href = 'cancle_install.html?workNo='+workNo;
+		}
+		
+		//完成订单
+		function complete_order(e){
+			var workNo = $(e).data("id");
+			console.log(workNo);
+			window.location.href = 'chioceMaterials.html?workNo='+workNo;
+		}
+		
+		//点击到详情页
+		function unOrderdetail(e){
+			var workNo = $(e).data("id");
+			console.log(workNo);
+			window.location.href = 'isOrder_detail.html?workNo='+workNo;
+		}
+		
+		
+
+		//call modal
+		var ModalClick = {
+			on: function() {
+				$(".modal").css({
+					display: 'block'
+				}).stop().animate({
+					opacity: 1
+				}, 600)
+			},
+			off: function() {
+				$(".modal").stop().animate({
+					opacity: 0
+				}, 800, function() {
+					$(this).css({
+						display: 'none'
+					})
+				})
+			}
+		}
+
+		function MyData() {
+			this._init();
+		}
+		MyData.prototype = {
+			//初始化
+			_init: function() {
+				this.toDetail();
+				this.toParise();
+				this.callSender();
+				this.toQuery();
+			},
+			//点击到订单详情
+			toDetail: function() {
+				$(".listCon .list_info").children('.middle').click(function() {
+					location.href = 'orderDetail.html'
+				})
+			},
+			//取消上门
+			toParise: function() {
+				$(".completed_Btn").click(function() {
+					location.href = 'cancel_visit.html'
+				})
+			},
+			//查看物流
+			toQuery: function() {
+				$(".cancelInstallBtn").click(function() {
+					location.href = 'applyTime.html';
+				})
+			},
+			//呼叫配送员
+			callSender: function() {
+				$(".callSenderBtn").click(function() {
+					ModalClick.on();
+				})
+				$(".cancle").click(function() {
+					ModalClick.off()
+				})
+			}
+		}
+		new MyData();
+</script>
