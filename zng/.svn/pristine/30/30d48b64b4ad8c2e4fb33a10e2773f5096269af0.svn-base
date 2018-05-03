@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>归还结果</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="../css/weui.min.css">
+		<link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../css/index.css">
+	</head>
+	<body>
+	<div class="container-fluid pay-success">
+	    <div class="row">
+	        <div class="col-xs-12">
+	            <div class="weui-msg">
+	                <div class="weui-msg__icon-area"><img src="../images/icon_success.png"></div>
+	                <p class="text-center">归还成功欢迎下次使用！</p>
+	               </div>
+	            </div>
+	        </div>
+	   </div>
+	</div>	
+	<script src="../js/jquery1.11.3.min.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+	<script src="../js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/mcfish.js?v=11232" type="text/javascript" charset="utf-8"></script>
+	</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>使用详情</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" href="../css/weui.min.css">
+        <link rel="stylesheet" type="text/css" href="../css/user.css?b=21212">
+	</head>
+	<body>
+        <div class="container-fluid borrow-detail">
+            <div class="row detail">
+                <div class="pull-left">当前状态:</div>
+                <div style="margin-left: 30px;" class="pull-left cdzid"></div>
+            </div>
+            <div class="row detail">
+                <div class="pull-left">使用时长:</div>
+                <div style="margin-left: 30px;" class="pull-left cdkid"></div>
+            </div>
+            <div class="row detail">
+                <div class="pull-left">费用:</div>
+                <div style="margin-left: 30px;" class="pull-left time"></div>
+            </div>
+            <div class="row detail">
+                <div class="pull-left">订单号:</div>
+                <div style="margin-left: 30px;" class="pull-left time-time"></div>
+            </div>
+            <div class="row detail">
+                <div class="pull-left">柜子ID:</div>
+                <div style="margin-left: 30px;" class="pull-left money"></div>
+            </div>
+            <div class="row detail">
+                <div class="pull-left">使用记录:</div>
+                <div style="margin-left: 30px;" class="pull-left ads"></div>
+            </div>
+            
+        </div>
+        <div class="borrow-detail-box">
+            <div class="syz" style="display: none;">
+                <a href="javascript:;" class="sayyes-btn weui-btn weui-btn_primary" style="border-radius:40px ;">确认支付</a>
+            </div>
+            <div class="ljsy">
+                <a href="javascript:;" class="ljsy-btn weui-btn weui-btn_primary" style="border-radius:40px ;">立即使用</a>
+            </div>
+            <div class="admin" style="display: none;">
+                <p>订单异常 ，请联系管理员</p>
+            </div>
+            <!--支付-->
+        </div>
+        <div class="row cash" style="display: none;">
+            <div class="cash-bg">
+                <div class="cash-content">
+                    <div class="cash-top">
+                        <div class="col-xs-7 cash-top-center">
+                            <span style="font-weight: bold;">支付</span>
+                        </div>
+                        <div class="col-xs-5 cash-top-right">
+                            <span class="close"><img src="../images/user-close.png"/></span>
+                        </div>
+                    </div>
+                    <div class="cash-center">
+                        <div class="col-xs-7 cash-top-center text-right money-btn">
+                            <span class="last-money" style="font-weight: bold;font-size: 20px;">0</span> 元
+                        </div>
+                    </div>
+                    <!--优惠券抵扣-->
+                    <div class="cash-btm">
+                        <div class="col-xs-9">优惠券</div>
+                        <div class="col-xs-3 check" style="text-align: right;"><span id="conpon-money">0</span>元</div>
+                    </div>
+                    <!--优惠券抵扣-->
+                    <div class="cash-btm" style="border-bottom: 1px solid #CCCCCC;">
+                        <div class="col-xs-9">实际支付</div>
+                        <div class="col-xs-3 check " style="text-align: right; "><span id="sj-money">0</span>元</div>
+                    </div>
+                    <!--钱包支付-->
+                    <div class="cash-btm" style="height: 35px;" onclick="choose_pay(this)">
+                        <input type="hidden" id='pay_way' value='0' />
+                        <div class="col-xs-2"><img src="../images/user-qbzf.png" /></div>
+                        <div class="col-xs-8">钱包支付</div>
+                        <div class="col-xs-2 check"><input type="radio" name="ipt" id="check-input1" value="" /></div>
+                    </div>
+                    <!--微信支付-->
+                    <div class="cash-foot" onclick="choose_pay(this)">
+                        <input type="hidden" id='pay_way' value='2' />
+                        <div class="col-xs-2"><img src="../images/user-wxzf.png" /></div>
+                        <div class="col-xs-8" id="aliword">微信支付</div>
+                        <div class="col-xs-2 check"><input type="radio" name="ipt" id="check-input2" value="" /></div>
+                    </div>
+                    <!--确认支付-->
+                    <div class="cash-zf ">
+                        <p onclick="open_user_device()">确认支付<span id='pay_money'>0</span>元</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+<script src="../js/jquery1.11.3.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+<script src="../js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/mcfish.js" type="text/javascript" charset="utf-8"></script>
+	
+</body>
+</html>
+			
+			

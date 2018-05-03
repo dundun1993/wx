@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>选择类型</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="../css/weui.min.css">
+		<link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../css/index.css">
+	</head>
+	<body style="background-color: #F4F4F4;">
+		<div class="container-fluid product-box">
+			<!--选择产品-->
+			<div class="row">
+				<div class="col-xs-6 productDiv">
+					<img class="product-imgA productImg borderStyle" data-type = "0" src="../images/product-a.png"/>
+					<div class="triangle" style="visibility:visible;">
+						<div></div>
+					</div>
+					<p>产品A</p>
+				</div>
+				<div class="col-xs-6 productDiv">
+					<img class="product-imgB productImg" data-type = "1" src="../images/product-b.png"/>
+					<div class="triangle">
+						<div></div>
+					</div>
+					<p>产品B</p>
+				</div>
+			</div>
+			<!--确定-->
+			<div class="confirm-btn">
+			 	<a href="javascript:;" class="weui-btn weui-btn_primary confirmBtn">确定</a>
+			</div>
+			<!--收费规则-->
+			<div class="charge-rule clearfix">
+				<span></span>
+				<span>收费规则：</span>
+				<span></span>
+			</div>
+			<p class="chargeRule">收费规则：--</p>
+		</div>
+		<!--付款弹框-->
+		<!--<div id="pay-style" class="weui-popup__container popup-bottom">
+		  	<div class="weui-popup__overlay weui-popup-overlay"></div>
+		  	<div class="weui-popup__modal">
+		   		<div class="container-fluid modal-box">
+		   			<div class="row modal-hd">
+		   				<div class="col-xs-6 modal-hd-word">
+		   					支付
+		   				</div>
+		   				<div class="col-xs-6 modal-hd-money">
+		   					<span>3.00</span>&nbsp;元
+		   				</div>
+		   			</div>
+		   			<div class="row modal-selectA">
+		   				<div class="col-xs-2">
+		   					<img src="../images/icon_wallet.png"/>
+		   				</div>
+		   				<div class="col-xs-8">
+		   					钱包支付
+		   				</div>
+		   				<div class="col-xs-2">
+		   					<img class="change-img wallet-pay" src="../images/bt_checked.png"/>
+		   				</div>
+		   			</div>
+		   			<div class="row modal-selectB">
+		   				<div class="col-xs-2">
+		   					<img src="../images/user-wxzf.png"/>
+		   				</div>
+		   				<div class="col-xs-8">
+		   					微信支付
+		   				</div>
+		   				<div class="col-xs-2">
+		   					<img class="change-img wx-pay" src="../images/bt_unchecked.png"/>
+		   				</div>
+		   			</div>
+		   			<div class="row modal-btn">
+		   				<button class="weui-btn weui-btn_primary close-popup">确认支付<span>2.00</span>元</button>
+		   			</div>
+		   		</div>
+		 	 </div>
+		</div>-->
+	<script src="../js/jquery1.11.3.min.js"></script>
+	<script src="../js/fastclick.js" type="text/javascript" charset="utf-8"></script>
+	<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+	<script src="../js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/mcfish.js" type="text/javascript" charset="utf-8"></script>
+	</body>
+</html>
+<script type="text/javascript">
+	var $http = mcfish.API;
+	var $tools = mcfish.Tools;
+	var openid    = $.cookie("openId");
+	var myUrl = $tools.parseURL(location.href);
+	const code    = myUrl.params['code']
+	var sno = myUrl.params['sno'];
+	sno = 'GXZNG000004';
+	var deposit = 0;
+	var systemKey = 'borrow_rule';
+	$(function() {
+		FastClick.attach(document.body);
+		// 登陆授权
+		if (openid != undefined) {
+			userInfo = $http.userLogin(openid, 'wx')
+		} else if (code != null) {
+			userInfo = $http.authLogin(code, 'wx')
+		} else {
+			var url = window.location.href
+			var auth = $http.get_auth_url_weixin(url, 'snsapi_userinfo')
+			window.location.href = auth
+			return
+		}
+		$http.getBorrowRule(sno,function(data) {
+			console.log(data)
+			if(data.status == 0&&data.data) {
+				$(".chargeRule").text('收费规则：'+data.data.costRule)
+			}
+		})
+//		给产品图片添加边框和三角的显示隐藏
+		$(".productImg").click(function() {
+			$(".productImg").removeClass("borderStyle");
+			$(this).addClass("borderStyle");
+			$(".triangle").css('visibility','hidden');
+			$(this).next().css('visibility','visible');
+		})
+//		选择付款方式
+		$(".change-img").click(function() {
+			$(".change-img").attr('src','../images/bt_unchecked.png')
+			$(this).attr('src','../images/bt_checked.png')
+		})
+//		支付
+		$(".confirmBtn").click(function() {
+//			$http.get_system_value(systemKey,function(data) {
+//				console.log(data)
+//			})
+			//获取钱包余额
+			$http.queryWallet(function(data) {
+				if(data.status == 0) {
+					var balMoney = data.data.money/100;
+					$http.get_system_value(systemKey,function(data) {
+						console.log(data)
+						if(data.status == 0) {
+							var minValue =data.data.value;
+							if(balMoney < minValue) {
+								alert('余额不足,请充值！');
+							}else {
+								var type = $(".borderStyle").data('type');
+								$http.borrow_one(sno,type,function(data) {
+									if (data.status == 0){
+										var orderno = data.data.orderno;
+										window.location.href = 'progress_bar.html?orderno='+orderno;
+									} else if (data.status == 502){
+										alert('余额不足！')
+									} else if (data.status == 503){
+										alert('暂无设备可用！')
+									} else if (data.status == 509){
+										alert('有未支付订单！')
+									}
+								})
+							}
+						}
+					})
+				}
+			})
+		})
+//		支付,使用设备
+//		$(".modal-btn button").click(function() {
+//			var type = $(".borderStyle").data('type');
+//			if ($(".wallet-pay").attr('src') == '../images/bt_checked.png'){
+//				$http.borrow_one(sno,type,function(data) {
+//					if (data.status == 0){
+//						var orderno = data.data.orderno;
+//						window.location.href = 'progress_bar.html?orderno='+orderno;
+//					} else if (data.status == 502){
+//						alert('余额不足！')
+//					} else if (data.status == 503){
+//						alert('暂无设备可用！')
+//					} else if (data.status == 509){
+//						alert('有未支付订单！')
+//					}
+//				})
+//			} else {
+////				微信支付
+//				
+//			}
+//		})
+	})
+</script>

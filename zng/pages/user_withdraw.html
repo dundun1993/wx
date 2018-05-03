@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>提现</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="../css/weui.min.css">
+		<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../css/user.css">
+	</head>
+	<body>
+        <div class="container-fluid charge withdrawals">
+            <div class="row">
+                <div class="col-xs-12 bg">
+                    <p class="value">280</p>
+                    <p class="remain">
+                        可提现金额(元)
+                    </p>
+                </div>
+            </div>
+            <div class="row withForm">
+                <div class="weui-cells weui-cells_form">
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <label class="weui-label">提现金额</label>
+                        </div>
+                        <div class="weui-cell__bd">
+                            <input class="weui-input" type="number" placeholder="请输入金额" id="inputMoney">
+                        </div>
+                        <div class="weui-cell_t_f">
+                            <label class="weui-label">元</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="we-btn weui-btn weui-btn_primary" id="getWithD">申请提现</button>
+            <p class="xieyi">
+                <a href="agreement.html?v=3">共享智能柜提现协议</a>
+            </p>
+        </div>        
+	<script src="../js/jquery1.11.3.min.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+	<script src="../js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/mcfish.js?v=11232" type="text/javascript" charset="utf-8"></script>
+    <script>
+        var $tools = mcfish.Tools
+        var $http  = mcfish.API
+        var myurl  = $tools.parseURL(location.href)
+        var withdrawmoney  = myurl.params['withdrawmoney']        
+        $(function () {
+            $('.value').text(withdrawmoney);
+
+            $('#getWithD').on('touchend', function () {
+                var money = $('.value').text()
+                var inputMoney = $('#inputMoney').val()
+                var aliName = $('#aliName').val()
+
+                if (inputMoney == '' || inputMoney == 0) {
+                    alert('输入不能为空');
+                    clear();
+                    return
+                }
+                if (inputMoney > withdrawmoney) {
+                    alert('提现金额不足')
+                    return
+                }
+                $http.withdraws({amount: inputMoney * 100,from: 1,cashto: 'wx',},function (res){
+                    if (res.status === 0) {
+                        alert('您已成功申请提现！')
+                        window.location.href="user_wallet.html"
+                    } else {
+                        alert(res.resmsg)
+                    }
+                })
+            })
+        })
+        function clear() {
+            $('#inputMoney').val('')
+            $('#aliAccount').val('')
+            $('#aliName').val('')
+        }
+    </script>
+	</body>
+</html>
+                                                                                                            
+
+                 
+
+                
+            
+   
+        
+                   
+                       
+                   
+                      
+                    
+                       
+                          
+                  

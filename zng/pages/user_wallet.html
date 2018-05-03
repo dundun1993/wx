@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>我的钱包</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="../css/weui.min.css">
+		<link rel="stylesheet" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../css/user.css?b=21212">
+	</head>
+	<body>
+        <div class="container-fluid money">
+            <div class="row">
+                <div class="col-xs-12 bg">
+                    <p class="money money-a">
+                        账户余额(元)
+                    </p>
+                    <p><span class='wallet-money'>0</span></p>
+                </div>
+            </div>
+            <div class="row first-top">
+                <div class="col-xs-12 tx-btn">
+                    <div class="col-xs-12 take-money-btm1">
+                        <a href="javascript:;" class="sayyes-btn weui-btn weui-btn_primary" style="border-radius:40px ;">提现</a>
+                    </div>
+                </div>
+                <div class="col-xs-12 cz-btn">
+                    <div class="col-xs-12 take-money-btm">
+                        <a href="javascript:;" class="sayyes-btn weui-btn weui-btn_primary" style="border-radius:40px ;">充值 </a>
+                    </div>
+                </div>
+            </div>
+        </div>		
+<script src="../js/jquery1.11.3.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+<script src="../js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+<script src="../js/mcfish.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	const $http       = mcfish.API;
+    var withdrawmoney = null;
+    $(function(){
+        $http.queryWallet(function(data) {// 获取钱包余额
+            if (data.status == 0) {
+                withdrawmoney = (data.data.money / 100) // 余额
+                $('.wallet-money').html(data.data.money/100)
+            }
+        })
+        
+        $('.tx-btn').on('click', function () { // 点击到提现页面
+            window.location.href="user_withdraw.html?withdrawmoney=" + withdrawmoney
+        })
+        
+        $('.cz-btn').on('click', function () { // 点击到充值页面
+            window.location.href="user_charge.html"
+        })	
+    })
+</script>
+</body>
+</html>

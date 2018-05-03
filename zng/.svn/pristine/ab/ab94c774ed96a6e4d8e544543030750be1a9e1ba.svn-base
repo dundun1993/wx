@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>个人信息</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="../css/weui.min.css">
+		<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../css/user.css">
+	</head>
+	<body>
+        <div class="userinfo">
+            <a class="weui-cell weui-cell_access" id="getImg" style="border-bottom: 0;">
+                <div class="weui-cell__hd">
+                    <img src="../images/user-head.png" id="iconHead" />
+                </div>
+                <div class="weui-cell__bd">
+                    <div class="weui-cell__ft">更换头像</div>
+                </div>
+            </a>
+            <input type="file" id="modImg" name="file" accept="image/*" style="height: 0;">
+            <a class="weui-cell weui-cell_access" id="nameC" href="user_mod_name.html">
+                <div class="weui-cell__bd">昵称</div>
+                <div class="weui-cell__bd">
+                    <div class="weui-cell__ft modyClick">xxx</div>
+                </div>
+            </a> 
+        </div>       
+	<script src="../js/jquery1.11.3.min.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+	<script src="../js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/mcfish.js?v=11232" type="text/javascript" charset="utf-8"></script>
+    </body>
+    <script type="text/javascript">
+        const $http       = mcfish.API;
+        const $handle = mcfish.Handle
+        var withdrawmoney = null;
+        $(function(){
+            $http.getProfile(function(res){
+                if (res.status == 0 ) {
+                    $('#iconHead').attr('src',res.data.head)
+                    $('.modyClick').text(res.data.name)
+                } else {
+                    alert(res.msg)
+                }
+            })
+            $('#getImg').on('touchend', function(){
+                $('#modImg').trigger('click')
+            })
+            $('#modImg').change(function () {
+                var files = $(this)[0].files[0];
+                $handle.postImgURL(files).then(function (result) {
+                    $http.uploadImage(result, function (res) {
+                        if (res.status == 0) {
+                            $('#iconHead').attr('src', res.data.img)
+                        } else {
+                            alert(res.resmsg)
+                        }
+                    })
+                })
+            })
+        })
+    </script>    
+</html>

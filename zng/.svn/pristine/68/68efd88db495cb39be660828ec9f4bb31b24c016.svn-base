@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>共享智能柜</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="../css/weui.min.css">
+		<link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../css/index.css">
+	</head>
+	<style type="text/css">
+		html,body{
+			height:100%;
+			width:100%;
+			overflow:hidden;
+			margin:0;
+			padding:0;
+		}
+	</style>
+	<body>
+		<div class="container-fluid progress-box">
+			<div class="progress-center">
+				<h3 class="progress-title">进度：0%</h3>
+            	<div class="progress">
+	                <div class="progress-bar" style="width:100%;"></div>
+	            </div>
+			</div>
+		</div>
+		<script src="../js/jquery1.11.3.min.js"></script>
+		<script src="../js/fastclick.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+		<script src="../js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/resize.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/mcfish.js" type="text/javascript" charset="utf-8"></script>
+	</body>
+	<script type="text/javascript">
+		var $http = mcfish.API;
+		var $tools = mcfish.Tools;
+		var myUrl = $tools.parseURL(location.href);
+		var orderno = myUrl.params['orderno'];
+		$(function() {
+			FastClick.attach(document.body);
+//			控制进度条变化
+			$(".progress-bar").resize(function() {
+				var progressWidth = $(".progress").width()
+				var percent =Math.floor($(this).width()/progressWidth*100)+1;
+				if(percent>100){
+					percent=100;
+					window.location.href = 'payment_finish.html?orderno='+orderno;
+				}
+				console.log(percent)
+				$(".progress-title").text('进度：'+percent+'%');
+			})
+		})
+	</script>
+</html>

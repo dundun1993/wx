@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>充值</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<link rel="stylesheet" href="../css/weui.min.css">
+	<link rel="stylesheet" href="../css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="../css/user.css?b=vc212">
+</head>
+
+<body>
+	<div class="container-fluid recharge">
+		<div class="row">
+			<div class="col-xs-12 button-btn" id="money-btn">
+			</div>
+		</div>
+		<div class="take-money">
+			<input type="number" step="0.01" class="form-control" id='money-inp' placeholder="输入充值金额" style="border: 1px solid #C0C0C0;">
+		</div>
+		<div class="take-money-btm">
+			<a href="javascript:;" class="sayyes-btn weui-btn weui-btn_primary" style="border-radius:40px ;">充值</a>
+		</div>
+	</div>
+
+	<script src="../js/jquery1.11.3.min.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+	<script src="../js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/mcfish.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		var $tools = mcfish.Tools
+		var $http  = mcfish.API
+		var myUrl = $tools.parseURL(location.href);
+		var deposit = myUrl.params['deposit'];
+		$(function () {
+			if(deposit) {
+				$("#money-inp").val('60').attr('disabled','disabled')
+				$(".sayyes-btn").on('touchend',function() {
+					var moneyval = 60*100;
+					$http.chargeMoney(moneyval, 2,1,function (data) { //押金
+						console.log(data)
+						if (data.status == 0) {
+							$http.wakeup_pay_weixin(data);
+						} else {
+							alert(data.resmsg)
+						}
+					})
+				})
+			} else {
+				$http.getCharge(function (data) { // 充值配置
+					if (data.status == 0) {
+						var chargemoney = data.data;
+						for (var i in chargemoney) {
+							$str = "";
+							$str += "<div class='disabled' data-id='" + (chargemoney[i].amount / 100) + "' onclick='moneyBtn(this)'>" + (chargemoney[i].amount / 100) + "</div>";
+							$("#money-btn").append($str);
+						}
+					}
+				})
+				$(".sayyes-btn").on("click", function () { // 充值
+					var moneyval = 0
+					var $moneyId = $(".seld").data("id")
+					$moneyId == undefined ? moneyval = $("#money-inp").val() * 100 : moneyval = $moneyId * 100
+					if (!moneyval) {
+						alert('请输入正确金额')
+						return
+					}
+					$http.chargeMoney(moneyval, 2, 0,function (data) {
+						console.log(data)
+						if (data.status == 0) {
+							$http.wakeup_pay_weixin(data);
+						} else {
+							alert(data.resmsg)
+						}
+					})
+				})
+				
+			}
+//			$http.getCharge(function (data) { // 充值配置
+//				if (data.status == 0) {
+//					var chargemoney = data.data;
+//					for (var i in chargemoney) {
+//						$str = "";
+//						$str += "<div class='disabled' data-id='" + (chargemoney[i].amount / 100) + "' onclick='moneyBtn(this)'>" + (chargemoney[i].amount / 100) + "</div>";
+//						$("#money-btn").append($str);
+//					}
+//				}
+//			})
+//			$(".sayyes-btn").on("click", function () { // 充值
+//				var moneyval = 0
+//				var $moneyId = $(".seld").data("id")
+//				$moneyId == undefined ? moneyval = $("#money-inp").val() * 100 : moneyval = $moneyId * 100
+//				if (!moneyval) {
+//					alert('请输入正确金额')
+//					return
+//				}
+//				$http.chargeMoney(moneyval, 2, function (data) {
+//					console.log(data)
+//					if (data.status == 0) {
+//						$http.wakeup_pay_weixin(data);
+//					} else {
+//						alert(data.resmsg)
+//					}
+//				})
+//			})
+		})
+		function moneyBtn(e) { // 获取充值金额
+			if ($(e).hasClass("seld")) {
+				$(e).removeClass('seld').css({'background-color': '#ffffff',"color": "#000000"})
+				$('.form-control').attr("disabled", false)
+			} else {
+				$(e).addClass('seld').css({'background-color': '#35d49a',"color": "#ffffff"}).siblings().css({'background-color': '#ffffff',"color": "#000000"}).removeClass("seld")
+				$(".form-control").attr("disabled", true)
+				$(".form-control").val('')
+			}
+		}
+	</script>
+</body>
+
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>附近网点</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="css/weui.min.css">
+	    <link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
+	    <link rel="stylesheet" href="css/bootstrap.min.css">
+	    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main.css?v=1.0"/>
+	    <link rel="stylesheet" type="text/css" href="css/index.css">
+	    <!--<script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=0e0df465af647f66559fe19ff817e3fd"></script>-->
+	    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=9922d6471b8bf691c9128a46fa4ff07f"></script>
+		<script src="http://webapi.amap.com/ui/1.0/main.js?v=1.0.10"></script>
+	</head>
+	<body>
+		<!--地图-->
+	    <div id="mapContainer"></div>
+		<!--search-->
+		<div id="tip" style="border-radius: 50px;padding: 0px;">
+		    <div id="info" class="col-xs-9" >
+		    	<select>
+		    		<option>切换分区</option>		    		
+		    	</select>
+		    </div>
+		    <div class="col-xs-3 " style="padding-left: 0;">
+		    	<button class="pull-left tip-btn">确定</button>
+		    </div>
+		</div>
+		<!--商家列表按钮-->
+		<button class="menu-btn" onclick="click_list()">
+			<img src="images/bt_menu.png"/>
+		</button>
+		<!--btm-->
+		<div class="container-fluid map-btm">
+			<div class="col-xs-2 map-btmleft">
+				<a onClick="geolocation.getCurrentPosition()"><img src="images/bt_location .png"/></a>
+			</div>
+			<div class="col-xs-8 pull-left map-center">
+				<div class="pull-left map-j ">
+			      <div class="borrow-btn">扫一扫&nbsp;&nbsp;借</div>
+			    </div>
+				<div class=" pull-right map-h ">
+				  <div class="return-btn">扫一扫&nbsp;&nbsp;还</div>
+			    </div>
+			</div> 
+			<div class="map-bad-fresh col-xs-2">
+				<img src="images/bt_refresh.png" alt=""  onClick="geolocation.getCurrentPosition()"/>
+			</div>
+		</div>
+		<!-- 商家详情 -->
+		
+		<div class="container-fluid net-list" id="id_shop_pannel" style="display: none;width: 100%;padding: 0;background: #FFFFFF;position: fixed;bottom: 0;z-index: 200;">
+			<div class="row">
+				<div class="col-xs-4 list-left" onclick="shop_detail()">
+					<img src="images/shop_img.png"/>
+				</div>
+				<div class="col-xs-5 list-center" onclick="shop_detail()">
+					<h4 class="shop-name">猫屎咖啡</h4>
+					<p class="shop-address">广州天河区棠东路1号</p>
+					<div>
+						<span class="usable">可用&nbsp;<em class="usable-num">5</em></span>
+						<span class="totale-num">共&nbsp;<em class="allused">20</em></span>
+					</div>
+				</div>
+				<div class="col-xs-3 list-right" onclick="open_map()">
+					<div>
+						<img src="images/icon_nav.png"/>
+						<p class="distance">200米</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="js/jquery1.11.3.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/fastclick.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/mcfish.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			var $http = mcfish.API;
+			var $tools = mcfish.Tools;
+			var myUrl = $tools.parseURL(location.href);
+			var map 			= null;	// 地图
+			var positionPicker	= null;	// 拖拽
+			var geolocation		= null;	// 定位
+			var markers 		= [];	// 地图中的标记
+			var shops			= [];	// 商家数据
+			var currLng			= null;	// 当前经度
+			var currLat			= null;	// 当前纬度
+			var currDis			= 5.00;	// 距离范围
+			const code    = myUrl.params['code']
+			var openid    = $.cookie("openId");
+			$(function(){
+				FastClick.attach(document.body);
+				// 登陆授权
+				if (openid != undefined) {
+					userInfo = $http.userLogin(openid, 'wx')
+				} else if (code != null) {
+					userInfo = $http.authLogin(code, 'wx')
+				} else {
+					var url = window.location.href
+					var auth = $http.get_auth_url_weixin(url, 'snsapi_userinfo')
+					window.location.href = auth
+					return
+				}				
+				
+				//初始化地图
+				init_map();
+				$(".borrow-btn").click(function() {
+					window.location.href = 'pages/borrow.html';
+				}); // 扫描借
+				$(".return-btn").click(function() {
+					window.location.href = 'pages/return.html';
+				}); // 扫描还
+		//		
+			})
+				
+			/**
+			 * @brief 高德地图初始化
+			 * */
+			function init_map(){
+				// 创建地图
+			    map = new AMap.Map('mapContainer', {
+			        resizeEnable: true,
+			        zoom:15
+			    });
+				// GPS 自动定位
+			   	map.plugin('AMap.Geolocation', function() {
+			        geolocation = new AMap.Geolocation({
+			            enableHighAccuracy: true,	// 是否使用高精度定位，默认:true
+			            timeout: 10000,				// 超过10秒后停止定位，默认：无穷大
+			            showButton: false,			// 显示定位按钮，默认：true
+			            buttonOffset: new AMap.Pixel(10, 20),// 定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+			            zoomToAccuracy: true,		// 定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+			            showMarker: true,			// 定位成功后在定位到的位置显示点标记，默认：true
+			            showCircle: false,			// 定位成功后用圆圈表示定位精度范围，默认：true
+			            showMarker: true,			// 定位成功后在定位到的位置显示点标记，默认：true
+			            panToLocation: true,		// 定位成功后将定位到的位置作为地图中心点，默认：true
+			            buttonPosition:'LB'
+			        });
+			        map.addControl(geolocation);
+			        geolocation.getCurrentPosition();
+			        AMap.event.addListener(geolocation, 'complete', update_shops);//返回定位信息
+			        AMap.event.addListener(geolocation, 'error', function(error){
+			        	console.log('err:' + JSON.stringify(error));
+			        });
+				});
+				// 添加拖拽事件
+				AMapUI.loadUI(['misc/PositionPicker'], function(PositionPicker) {
+					positionPicker = new PositionPicker({
+				        mode: 'dragMap',
+				        map : map,
+				        iconStyle: { //自定义外观
+		                url: 'images/icon_location.png',
+		                ancher: [19, 53],
+		                size: [38, 61]
+		            	}
+				    });
+					positionPicker.on('success', function(positionResult) {
+						update_shops(positionResult);
+					});
+					positionPicker.start();
+				});
+			
+				// 地图点击事件
+				map.map.on('click', function(e) {
+					$("#id_shop_pannel").hide();
+				});	
+				// 定位到我的坐标
+				 map.setFitView();
+			}
+		
+			// 更新网点信息
+			function update_shops(data){
+			  // 1.定义网点坐标数组
+			    currLng = data.position.getLng();
+			    currLat = data.position.getLat();
+				$.cookie("lng", currLng);
+				$.cookie("lat", currLat);
+				$.cookie("dis", currDis);
+				//获取商家信息 展示标注
+				$http.get_home_list(currLng, currLat, currDis, function(data){
+					console.log(data)
+					if (data.status != 0){
+						return;
+					}
+					shops = data.data;
+					
+					// 清除markers
+					map.remove(markers);
+			
+					// 显示网点
+					for (var i=0, marker; i < shops.length; i++){
+						marker = new AMap.Marker({
+								position: [shops[i].lng, shops[i].lat],
+								map: map,
+								icon: new AMap.Icon({
+								size: new AMap.Size(100, 100),  //图标大小
+								image: "images/icon_shopsimg.png",
+								imageOffset: new AMap.Pixel(0, 0)
+							}),
+						});
+						shops[i].dis = $tools.getDisance(currLat, currLng, shops[i].lat, shops[i].lng);
+			  		// 添加点击事件
+			  		marker.content = i;
+			   		marker.on('click', function(e){
+							show_shops(e.target.content);
+						});
+				
+			  		markers.push(marker);
+					}
+				});
+			}		
+			/**
+			 * @brief 显示店铺详细信息
+			 * */
+			function show_shops(i){
+				var shop = shops[i];
+				$(".list-left").attr('data-id',shop.id);
+				$(".list-left img").attr('src',shop.img);
+				$(".list-right").attr({shoplng:shop.lng,shoplat:shop.lat});
+				$(".shop-name").text(shop.name);
+				$(".shop-address").text(shop.address);
+				$(".usable-num").text(shop.used);		
+				$(".allused").text(shop.total);		
+				$(".distance").text(shop.dis+'米');
+				// 显示面板
+				$("#id_shop_pannel").show();
+			}
+			/**
+			 * @brief 进入店铺详情
+			 * */
+			function shop_detail(){
+				var shopId = $(".list-left").data('id');
+				console.log(shopId)
+				window.location.href = "pages/network_detail.html?shopid=" + shopId;
+			}
+			/**
+			 * @brief 打开微信地图
+			 * */
+			function open_map(){
+				var shoplng = $(".list-right").attr("shoplng");
+				var shoplat = $(".list-right").attr("shoplat");
+				var adrname = $(".list-right").prev().children(".shop-address").text();
+				console.log(adrname)
+				var url = window.location.href;
+				$http.openlocation(url,shoplat,shoplng,adrname);
+			}
+			/**
+			 * @brief 点击进入附近列表
+			 * */
+			 function click_list(){
+			 	var siteinfo = [currLng,currLat,currDis]
+//				window.location.href = "pages/network_list.html?currLng="+currLng+"&currLat="+currLat+"&currDis="+currDis;
+				window.location.href = "pages/network_list.html?siteinfo="+siteinfo;
+			}
+			/**
+			 * @brief 获取选择区域列表
+			 * */		
+			$http.get_area_list(function(data) {		
+				var area = data.data;
+				console.log(area)
+				if (data.status == 0){
+					for(var i=0; i<area.length; i++){						
+						var str = '';
+						str = '<option data-id='+area[i].id+'>'+area[i].name+'</option>'
+						$("#info select").append(str);
+					}
+				}
+				
+			})
+			/**
+		 * @brief 切换分区
+		 * */
+			$(".tip-btn").click(function() {
+				var areaId = $("#info select>option:selected").data('id');
+				$http.check_area_detail(areaId,function(data) {
+					console.log(data)
+//					切换请求到的地图
+				})
+			})
+		</script>
+	</body>
+</html>

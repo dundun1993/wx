@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>修改昵称</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="../css/weui.min.css">
+		<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../css/user.css">
+	</head>
+	<body>
+    <div class="mod-name">
+        <input type="text" class="mod-name-input" placeholder="请输入昵称">
+        <a class="weui-btn weui-cell_access">确定</a> 
+    </div>
+	<script src="../js/jquery1.11.3.min.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+	<script src="../js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/mcfish.js?v=11232" type="text/javascript" charset="utf-8"></script>
+	</body>
+	<script>
+		const $http = mcfish.API
+		const reg = /^[\u4E00-\u9FA5A-Za-z0-9_]+$/
+		$(function(){
+			$('.weui-btn').on('touchend', function(){
+				let inputVal = $('.mod-name-input').val()
+				if (!inputVal) {
+					alert('请输入修改昵称')
+					return
+				}
+				if (!reg.test(inputVal)) {
+					alert('请输入中文、英文、数字包括下划线')
+					return
+				}
+				$http.uptProfile({name:inputVal},function(res){
+					if (res.status == 0) {
+						alert('修改成功')
+						window.location.href = './user_info.html'
+					} else {
+						alert(res.msg)
+					}
+				})
+			})
+		})
+	</script>
+</html>

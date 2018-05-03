@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>网点详情</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="../css/weui.min.css">
+		<link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../css/index.css">
+	</head>
+	<body>
+		<div class="container-fluid shop-head">
+			<div class="shop-hd-bg">
+				<img src="../images/bg_shopdetail.png"/>
+			</div>
+			<div class="head-img">
+				<img class="bg-headimg" src="../images/bg_headimg.png"/>
+				<img class="shopHeadImg" src="../images/shop_img.png"/>
+				<div class="borrowBtn">
+				 	<a href="javascript:;" class="weui-btn weui-btn_primary">借用柜子</a>
+				</div>
+			</div>
+		</div>
+		<div class="container-fluid shop-info">
+			<div class="row shop-info-list">
+				<div class="col-xs-2">
+					<img src="../images/icon_shopname.png"/>
+				</div>
+				<div class="col-xs-10 shop-info-name">
+					猫屎咖啡
+				</div>
+			</div>
+			<div class="row shop-info-list open-map">
+				<div class="col-xs-2">
+					<img src="../images/icon_shopaddress.png"/>
+				</div>
+				<div class="col-xs-9 shop-info-address">
+					科苑北科兴科学园B栋BG-15号
+				</div>
+				<div class="col-xs-1">
+					<img src="../images/icon_rigth.png"/>
+				</div>
+			</div>
+		</div>
+		<script src="../js/jquery1.11.3.min.js"></script>
+		<script src="../js/fastclick.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+		<script src="../js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+		<script src="../js/mcfish.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			var $http = mcfish.API;
+			var $tools = mcfish.Tools;
+			var myUrl = $tools.parseURL(location.href);
+			var shopid = myUrl.params['shopid'];
+			$(function() {
+				FastClick.attach(document.body);
+				$http.get_shop_detail(shopid,function(data) {
+					var info = data.data;
+					console.log(info)
+					if (data.status == 0){
+						$(".shopHeadImg").attr('src',info.img);
+						$(".shop-info-name").text(info.name);
+						$(".shop-info-address").text(info.address);
+						$(".open-map").click(function() {
+							var url = window.location.href;
+							$http.openlocation(url,info.lat,info.lng,info.address);
+						})
+					}
+				})
+				$(".borrowBtn a").click(function() {
+					window.location.href = 'borrow.html';
+				})
+			})
+		</script>
+	</body>
+</html>

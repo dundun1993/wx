@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>共享智能柜</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="../css/weui.min.css">
+		<link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../css/user.css">
+	</head>
+	<body>
+    <div class="user-share">
+        <div class="user-share-content">
+            <img src="../images/user-share-cou.png" alt="优惠券">
+            <p>你有一张优惠券尚未领取</p>
+            <input type="number" class="user-share-phone" oninput="if(value.length>11)value=value.slice(0,11)" placeholder="输入手机号立即领取">
+            <a class="weui-btn weui-cell_access">确定</a>
+        </div>
+    </div>
+	<script src="../js/jquery1.11.3.min.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+	<script src="../js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/mcfish.js?v=11232" type="text/javascript" charset="utf-8"></script>
+	</body>
+</html>
