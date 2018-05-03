@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>共享摄影灯</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<link rel="stylesheet" href="../../css/weui.min.css">
+		<link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="../../css/less.css">
+	</head>
+	<body>
+		<div class="container-fluid coupon">
+			<div class="row coupon">
+				<div class="container coupon-content">
+					<script id="tpl_myCoupon" type="text/html">
+						{{each data couponData index }}
+						{{if couponData.worthMoney}}
+						<div class="row btm-content" data-id="{{index}}">
+								<div class="container-fluid coupon-bgimg">
+									<img src="../../images/youhuibg.png" alt="优惠券">
+									<div class="btm-content-text">
+										<div class="col-xs-2 btm-content-money">
+											<span>{{couponData.worthMoney}}</span>
+										</div>
+										<div class="col-xs-6 btm-content-a">
+											<p>{{couponData.brief}}</p>
+											<p class="btm-content-text-btm">有效期<span>{{couponData.endTime}}</span></p>
+										</div>
+										<div class="col-xs-4 btm-content-btn-text pull-right">
+											<p>使用</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						{{/if}}
+						{{/each}}
+						{{ if data.length == 0 }}
+						<div class='noCoupon'>
+							<img src="../../images/cry.png" alt="暂无优惠券">
+							<p>暂无优惠券</p>
+						</div>
+						{{/if}}
+					</script>
+				</div>
+			</div>
+		</div>
+
+<script src="../../js/jquery1.11.3.min.js"></script>
+<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+<script src="../../js/mcfish.js"></script>
+<script>
+	$(function(){
+        var $http = mcfish.API;
+        $http.get_my_coupon(function (res) {
+            if (res.status === 0 ){
+				for (var i = 0; i < res.data.length; i++){
+					res.data[i].endTime = new Date(res.data[i].endTime).toLocaleString().split(' ')[0].replace(/\//g,'-')
+				}
+				var couponArr = res;
+				var couHtml = template('tpl_myCoupon', couponArr)
+				$('.coupon-content').html(couHtml)
+			}
+			else {
+				alert(res.resmsg)
+			}
+        })
+    })
+</script>
+</body>
+</html>

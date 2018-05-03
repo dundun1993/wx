@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>共享摄影灯</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<link rel="stylesheet" href="../../css/weui.min.css">
+	<link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/less.css">
+</head>
+
+<body>
+	<div class="container-fluid money">
+		<div class="row">
+			<div class="col-xs-12 bg">
+				<p id='getM'></p>
+				<p class="money money-a">
+					缴纳押金(元)
+				</p>
+				<p class="money-b">收费规则</p>
+			</div>
+		</div>
+		<div class="row first-top" style="margin-top: 15px;">
+			<div class="col-xs-12 first-top-btm">
+				<a href="" id="gethref">
+					<div class="center_div"><img src="../../images/tixian.png"></div>
+					<div class="center_div_1">提现</div>
+					<div class="center_div_2"><img src="../../images/right.png"></div>
+				</a>
+			</div>
+			<div class="col-xs-12 first-top-btm">
+				<a href="" id="inMoney">
+					<div class="center_div"><img src="../../images/chongzhi.png"></div>
+					<div class="center_div_1">充值</div>
+					<div class="center_div_2"><img src="../../images/right.png"></div>
+				</a>
+			</div>
+		</div>
+	</div>
+	<script src="../../js/jquery1.11.3.min.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+	<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../js/mcfish.js"></script>
+	<script>
+		$(function () {
+			var $http = mcfish.API;
+			$http.queryWallet(function (res) {
+				if (res.status === 0) {
+					$('#getM').text(res.data.deposit / 100)
+				}
+				else {
+					alert(res.resmsg);
+				}
+			})
+			$('#gethref').click(function(){
+				var money = $('#getM').text();
+				$(this).attr('href','./withdrawals.html?withd='+money)
+			})
+			$('#inMoney').click(function(){
+				$(this).attr('href','./deposit.html')
+			})
+		})
+	</script>
+</body>
+
+</html>

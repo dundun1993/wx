@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>共享摄影灯</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<link rel="stylesheet" href="../../css/weui.min.css">
+	<link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="../../css/bootstrap.min.css" />
+	<link rel="stylesheet" type="text/css" href="../../css/less.css?v=112">
+</head>
+
+<body>
+	<div class="container-fluid user">
+			<div class="row">
+				<div class="col-xs-12 user-top">
+					<div class="head-title">
+						<script id="tpl_user" type="text/html">
+							<a href="./userInfo.html?auth={{data.auth}}">
+								<div class="user-img">
+									{{if data.head}}
+									<img src="{{data.head}}" class="headerIcon"/>
+									{{else}}
+									<img src="../../images/head.png" class="headerIcon"/>
+									{{/if}}					
+								</div>
+								<div class="user">
+									<p class="userName">{{data.name}}</p>
+								</div>
+							</a>
+						</script>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="row content_top styleA">
+					<div class="col-xs-12">
+						<a href="./wallet.html">
+							<div class="center_div"><img src="../../images/qb.png"></div>
+							<div class="center_div_1">账户押金</div>
+							<div class="center_div_2"><img src="../../images/right.png"></div>
+						</a>
+					</div>
+				</div>
+				<div class="row content_top styleA">
+					<div class="col-xs-12">
+						<a href="./my_coupon.html">
+							<div class="center_div"><img src="../../images/yhq.png"></div>
+							<div class="center_div_1">我的优惠券</div>
+							<div class="center_div_2"> <img src="../../images/right.png"></div>
+						</a>
+					</div>
+				</div>
+				<div class="row content_top styleA">
+					<div class="col-xs-12">
+						<a href="./deal.html">
+							<div class="center_div"><img src="../../images/qb.png"></div>
+							<div class="center_div_1">交易记录</div>
+							<div class="center_div_2"><img src="../../images/right.png"></div>
+						</a>
+					</div>
+				</div>
+				<div class="row first-top mar-top styleA">
+					<div class="col-xs-12">
+						<a href="./useageLog.html">
+							<div class="center_div"><img src="../../images/ji.png"></div>
+							<div class="center_div_1">使用记录</div>
+							<div class="center_div_2"><img src="../../images/right.png"></div>
+						</a>
+					</div>
+				</div>
+				<div class="row first-btm styleA">
+					<div class="col-xs-12">
+						<a href="./share.html">
+							<div class="center_div"><img src="../../images/fx.png"></div>
+							<div class="center_div_1">推荐分享</div>
+							<div class="center_div_2"><img src="../../images/right.png"></div>
+						</a>
+					</div>
+				</div>
+			</div>
+			<div class="row first-top">
+				<div class="col-xs-12 first-top-btm styleA">
+					<a href="../dev/getinfo.html">
+						<div class="center_div"><img src="../../images/bz.png"></div>
+						<div class="center_div_1">使用帮助</div>
+						<div class="center_div_2"><img src="../../images/right.png"></div>
+					</a>
+				</div>
+				<div class="col-xs-12 first-top-btm styleA">
+					<a href="../dev/about.html">
+						<div class="center_div"><img src="../../images/gy.png"></div>
+						<div class="center_div_1">关于我们</div>
+						<div class="center_div_2"><img src="../../images/right.png"></div>
+					</a>
+				</div>
+			</div>
+	</div>
+
+	<script src="../../js/jquery1.11.3.min.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+	<script src="../../js/jquery.cookie.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../js/template-web.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../../js/mcfish.js"></script>
+	<script>
+		var $http = mcfish.API;
+		var $tools = mcfish.Tools;
+		var isAlipay = $http.is_alipay();
+		var myUrl = $tools.parseURL(location.href);
+		var code = null;
+		$(function () {
+			if ($.cookie('token') != undefined && $.cookie('uid') != undefined) {
+				$http.userLogin(function(res){
+					var userHtml = template('tpl_user', res);
+					$('.head-title').html(userHtml)
+				})
+			} else {
+				refreshUser();
+			}
+		})
+
+		function refreshUser() {
+			if (isAlipay) {
+				code = myUrl.params['auth_code'];
+			} else {
+				code = myUrl.params['code'];
+			}
+			if (code != null) {
+				if (isAlipay) {
+					userInfo = $http.authLogin(code, 'alipay');  // 同步获取支付宝
+				} else {
+					userInfo = $http.authLogin(code, 'wx', function(res){						
+						var userHtml = template('tpl_user', res);
+						$('.head-title').html(userHtml)
+					}); // 同步获取微信
+				}
+			} else {
+				var url = window.location.href;
+				var auth = null;
+				if (isAlipay) {
+					auth = $http.get_auth_url_alipay(url, 'auth_user');
+				} else {
+					auth = $http.get_auth_url_weixin(url, 'snsapi_userinfo');
+				}
+				window.location.href = auth;
+				return;
+			}
+		}
+	</script>
+
+</body>
+
+</html>
